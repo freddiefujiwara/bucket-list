@@ -8,7 +8,15 @@ export default defineConfig(({ mode }) => {
     plugins: [vue()],
     test: {
       environment: 'jsdom',
-      globals: true
+      globals: true,
+      coverage: {
+        provider: 'v8',
+        reporter: ['text', 'html'],
+        statements: 100,
+        branches: 100,
+        functions: 100,
+        lines: 100
+      }
     }
   };
 });

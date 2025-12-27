@@ -30,4 +30,16 @@ describe('normalizeItems', () => {
       link: 'https://kyoto.jp'
     });
   });
+
+  it('returns empty array when payload is missing', () => {
+    expect(normalizeItems(null)).toEqual([]);
+    expect(normalizeItems({ data: [] })).toEqual([]);
+  });
+
+  it('uses fallback ids and titles', () => {
+    const result = normalizeItems([{ notes: 'memo' }]);
+
+    expect(result[0].id).toContain('Item 1');
+    expect(result[0].title).toBe('Item 1');
+  });
 });

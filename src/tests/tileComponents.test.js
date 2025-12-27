@@ -20,6 +20,19 @@ describe('TileCard', () => {
     const anchor = wrapper.get('a');
     expect(anchor.attributes('href')).toBe('https://example.com');
   });
+
+  it('omits optional fields when missing', () => {
+    const wrapper = mount(TileCard, {
+      props: {
+        item: {
+          title: 'No extras'
+        }
+      }
+    });
+
+    expect(wrapper.find('img').exists()).toBe(false);
+    expect(wrapper.find('a').exists()).toBe(false);
+  });
 });
 
 describe('TileGrid', () => {
