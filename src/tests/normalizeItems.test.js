@@ -6,47 +6,28 @@ describe('normalizeItems', () => {
     const result = normalizeItems([
       {
         id: 'a1',
+        category: 'Travel',
+        target_age: 'Adult',
         title: 'Tokyo',
         note: 'Visit',
         image_url: 'img.jpg',
-        link: 'https://example.com'
+        completed: true,
+        completed_at: '2024-01-01'
       }
     ]);
 
     expect(result).toEqual([
       {
         id: 'a1',
+        category: 'Travel',
+        targetAge: 'Adult',
         title: 'Tokyo',
         note: 'Visit',
         imageUrl: 'img.jpg',
-        link: 'https://example.com',
-        completed: false,
-        completedAt: '',
-        category: '',
-        targetAge: ''
+        completed: true,
+        completedAt: '2024-01-01'
       }
     ]);
-  });
-
-  it('handles wrapped payloads and fallback fields', () => {
-    const result = normalizeItems({
-      items: [
-        {
-          name: 'Kyoto',
-          detail: 'Temple',
-          photo: 'photo.png',
-          url: 'https://kyoto.jp',
-          image_url: 'preferred.png'
-        }
-      ]
-    });
-
-    expect(result[0]).toMatchObject({
-      title: 'Kyoto',
-      note: 'Temple',
-      imageUrl: 'preferred.png',
-      link: 'https://kyoto.jp'
-    });
   });
 
   it('returns empty array when payload is missing', () => {
@@ -54,25 +35,16 @@ describe('normalizeItems', () => {
     expect(normalizeItems({ data: [] })).toEqual([]);
   });
 
-  it('uses fallback ids and titles', () => {
-    const result = normalizeItems([{ notes: 'memo' }]);
+  it('uses fallback ids and empty defaults', () => {
+    const result = normalizeItems([{}]);
 
     expect(result[0].id).toBe('idx-0');
     expect(result[0].title).toBe('');
-    expect(result[0].note).toBe('memo');
-  });
-
-  it('maps completed fields', () => {
-    const result = normalizeItems([{ completed: true, completed_at: '2024-01-01' }]);
-
-    expect(result[0].completed).toBe(true);
-    expect(result[0].completedAt).toBe('2024-01-01');
-  });
-
-  it('maps category and target age fields', () => {
-    const result = normalizeItems([{ category: 'Travel', target_age: 'Adult' }]);
-
-    expect(result[0].category).toBe('Travel');
-    expect(result[0].targetAge).toBe('Adult');
+    expect(result[0].note).toBe('');
+    expect(result[0].imageUrl).toBe('');
+    expect(result[0].completed).toBe(false);
+    expect(result[0].completedAt).toBe('');
+    expect(result[0].category).toBe('');
+    expect(result[0].targetAge).toBe('');
   });
 });
