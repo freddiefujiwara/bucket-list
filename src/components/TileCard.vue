@@ -20,7 +20,7 @@
           type="button"
           @click="$emit('filter', { type: 'targetAge', value: item.targetAge })"
         >
-          {{ item.targetAge }}
+          {{ formatTargetAge(item.targetAge) }}
         </button>
       </div>
       <p v-if="item.note">{{ item.note }}</p>
@@ -29,7 +29,7 @@
       </a>
     </div>
     <div v-if="item.completed && item.completedAt" class="overlay">
-      <span>達成日: {{ item.completedAt }}</span>
+      <span>達成日: {{ formatDate(item.completedAt) }}</span>
     </div>
   </article>
 </template>
@@ -43,6 +43,25 @@ defineProps({
 });
 
 defineEmits(['filter']);
+
+const formatDate = (value) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}年${month}月${day}日`;
+};
+
+const formatTargetAge = (value) => {
+  const numeric = Number.parseInt(value, 10);
+  if (Number.isNaN(numeric)) {
+    return `目標: ${value}`;
+  }
+  return `目標: ${numeric}歳台`;
+};
 </script>
 
 <style scoped>

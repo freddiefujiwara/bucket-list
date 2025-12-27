@@ -46,7 +46,7 @@ describe('TileCard', () => {
     });
 
     expect(wrapper.classes()).toContain('completed');
-    expect(wrapper.text()).toContain('達成日: 2024-03-10');
+    expect(wrapper.text()).toContain('達成日: 2024年03月10日');
   });
 
   it('emits filter events for category and target age', async () => {
@@ -68,6 +68,20 @@ describe('TileCard', () => {
       [{ type: 'category', value: 'Food' }],
       [{ type: 'targetAge', value: 'Kids' }]
     ]);
+    expect(wrapper.text()).toContain('目標: Kids');
+  });
+
+  it('formats numeric target age as decade', () => {
+    const wrapper = mount(TileCard, {
+      props: {
+        item: {
+          title: 'Plan',
+          targetAge: 50
+        }
+      }
+    });
+
+    expect(wrapper.text()).toContain('目標: 50歳台');
   });
 });
 
