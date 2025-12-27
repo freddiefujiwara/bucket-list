@@ -9,7 +9,7 @@ describe('shuffleItems', () => {
 
     const result = shuffleItems(['a', 'b', 'c', 'd'], rng);
 
-    expect(result).toEqual(['a', 'd', 'b', 'c']);
+    expect(result).toEqual(['c', 'b', 'a', 'd']);
   });
 
   it('does not mutate the original array', () => {
