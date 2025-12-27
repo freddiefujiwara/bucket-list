@@ -64,4 +64,11 @@ describe('normalizeItems', () => {
     expect(result[0].completed).toBe(true);
     expect(result[0].completedAt).toBe('2024-01-01');
   });
+
+  it('maps category and target age fields', () => {
+    const result = normalizeItems([{ category: 'Travel', target_age: 'Adult' }]);
+
+    expect(result[0].category).toBe('Travel');
+    expect(result[0].targetAge).toBe('Adult');
+  });
 });

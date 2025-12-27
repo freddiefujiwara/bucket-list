@@ -1,6 +1,6 @@
 <template>
   <div class="grid">
-    <TileCard v-for="item in items" :key="item.id" :item="item" />
+    <TileCard v-for="item in items" :key="item.id" :item="item" @filter="$emit('filter', $event)" />
   </div>
 </template>
 
@@ -13,6 +13,8 @@ defineProps({
     default: () => []
   }
 });
+
+defineEmits(['filter']);
 </script>
 
 <style scoped>

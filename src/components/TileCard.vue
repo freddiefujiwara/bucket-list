@@ -5,6 +5,24 @@
     </div>
     <div class="body">
       <h2>{{ item.title }}</h2>
+      <div class="meta" v-if="item.category || item.targetAge">
+        <button
+          v-if="item.category"
+          class="chip"
+          type="button"
+          @click="$emit('filter', { type: 'category', value: item.category })"
+        >
+          {{ item.category }}
+        </button>
+        <button
+          v-if="item.targetAge"
+          class="chip"
+          type="button"
+          @click="$emit('filter', { type: 'targetAge', value: item.targetAge })"
+        >
+          {{ item.targetAge }}
+        </button>
+      </div>
       <p v-if="item.note">{{ item.note }}</p>
       <a v-if="item.link" :href="item.link" target="_blank" rel="noopener noreferrer">
         詳細を見る
@@ -23,6 +41,8 @@ defineProps({
     required: true
   }
 });
+
+defineEmits(['filter']);
 </script>
 
 <style scoped>
@@ -72,6 +92,23 @@ p {
   color: #4b5563;
   font-size: 0.95rem;
   flex: 1;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  border: none;
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: #e5e7eb;
+  color: #374151;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 a {

@@ -16,6 +16,8 @@ export const normalizeItems = (payload) => {
     imageUrl: item.image_url || item.image || item.imageUrl || item.photo || '',
     link: item.link || item.url || item.href || '',
     completed: Boolean(item.completed),
-    completedAt: item.completed_at || item.completedAt || ''
+    completedAt: item.completed_at || item.completedAt || '',
+    category: item.category || item.genre || '',
+    targetAge: item.target_age || item.targetAge || ''
   }));
 };

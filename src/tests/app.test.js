@@ -72,4 +72,27 @@ describe('App', () => {
     expect(fetchJsonp).toHaveBeenCalledTimes(2);
     expect(wrapper.text()).toContain('Second');
   });
+
+  it('filters by category and clears filter', async () => {
+    fetchJsonp.mockResolvedValueOnce([{ id: '1', title: 'A' }]);
+    normalizeItems.mockReturnValueOnce([
+      { id: '1', title: 'A', category: 'Travel' },
+      { id: '2', title: 'B', category: 'Food' }
+    ]);
+
+    const wrapper = mount(App);
+    await flushPromises();
+
+    await wrapper.find('button.chip').trigger('click');
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('絞り込み:');
+    expect(wrapper.text()).toContain('カテゴリ - Travel');
+    expect(wrapper.text()).not.toContain('B');
+
+    await wrapper.get('.filter-chip').trigger('click');
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('B');
+  });
 });

@@ -48,6 +48,27 @@ describe('TileCard', () => {
     expect(wrapper.classes()).toContain('completed');
     expect(wrapper.text()).toContain('達成日: 2024-03-10');
   });
+
+  it('emits filter events for category and target age', async () => {
+    const wrapper = mount(TileCard, {
+      props: {
+        item: {
+          title: 'Tagged',
+          category: 'Food',
+          targetAge: 'Kids'
+        }
+      }
+    });
+
+    const buttons = wrapper.findAll('button.chip');
+    await buttons[0].trigger('click');
+    await buttons[1].trigger('click');
+
+    expect(wrapper.emitted('filter')).toEqual([
+      [{ type: 'category', value: 'Food' }],
+      [{ type: 'targetAge', value: 'Kids' }]
+    ]);
+  });
 });
 
 describe('TileGrid', () => {
