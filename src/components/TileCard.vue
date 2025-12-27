@@ -167,12 +167,13 @@ a {
 
 .overlay {
   position: absolute;
-  inset: auto 12px 12px 12px;
-  background: rgba(31, 41, 55, 0.8);
+  inset: 12px 12px auto 12px;
+  background: rgba(31, 41, 55, 0.7);
   color: #fff;
   padding: 8px 12px;
   border-radius: 12px;
   font-size: 0.85rem;
   text-align: center;
+  pointer-events: none;
 }
 </style>
