@@ -19,7 +19,9 @@ describe('normalizeItems', () => {
         title: 'Tokyo',
         note: 'Visit',
         imageUrl: 'img.jpg',
-        link: 'https://example.com'
+        link: 'https://example.com',
+        completed: false,
+        completedAt: ''
       }
     ]);
   });
