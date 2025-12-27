@@ -21,7 +21,9 @@ describe('normalizeItems', () => {
         imageUrl: 'img.jpg',
         link: 'https://example.com',
         completed: false,
-        completedAt: ''
+        completedAt: '',
+        category: '',
+        targetAge: ''
       }
     ]);
   });

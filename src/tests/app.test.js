@@ -88,11 +88,12 @@ describe('App', () => {
 
     expect(wrapper.text()).toContain('絞り込み:');
     expect(wrapper.text()).toContain('カテゴリ - Travel');
-    expect(wrapper.text()).not.toContain('B');
+    expect(wrapper.findAll('article.card')).toHaveLength(1);
+    expect(wrapper.text()).toContain('A');
 
     await wrapper.get('.filter-chip').trigger('click');
     await flushPromises();
 
-    expect(wrapper.text()).toContain('B');
+    expect(wrapper.findAll('article.card')).toHaveLength(2);
   });
 });
