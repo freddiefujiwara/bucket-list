@@ -1,5 +1,5 @@
 <template>
-  <article class="card" :class="{ completed: item.completed }">
+  <article class="card" :class="{ completed: item.completed }" @click="$emit('select', item)">
     <div v-if="item.imageUrl" class="media">
       <img :src="item.imageUrl" :alt="item.title" loading="lazy" />
     </div>
@@ -10,7 +10,7 @@
           v-if="item.category"
           class="chip"
           type="button"
-          @click="$emit('filter', { type: 'category', value: item.category })"
+          @click.stop="$emit('filter', { type: 'category', value: item.category })"
         >
           {{ item.category }}
         </button>
@@ -18,13 +18,19 @@
           v-if="item.targetAge"
           class="chip"
           type="button"
-          @click="$emit('filter', { type: 'targetAge', value: item.targetAge })"
+          @click.stop="$emit('filter', { type: 'targetAge', value: item.targetAge })"
         >
           {{ formatTargetAge(item.targetAge) }}
         </button>
       </div>
       <p v-if="item.note">{{ item.note }}</p>
-      <a v-if="item.link" :href="item.link" target="_blank" rel="noopener noreferrer">
+      <a
+        v-if="item.link"
+        :href="item.link"
+        target="_blank"
+        rel="noopener noreferrer"
+        @click.stop
+      >
         詳細を見る
       </a>
     </div>
@@ -42,7 +48,7 @@ defineProps({
   }
 });
 
-defineEmits(['filter']);
+defineEmits(['filter', 'select']);
 
 const formatDate = (value) => {
   const date = new Date(value);

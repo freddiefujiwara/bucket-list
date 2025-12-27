@@ -83,6 +83,20 @@ describe('TileCard', () => {
 
     expect(wrapper.text()).toContain('目標: 50歳台');
   });
+
+  it('emits select when card is clicked', async () => {
+    const wrapper = mount(TileCard, {
+      props: {
+        item: {
+          title: 'Click me'
+        }
+      }
+    });
+
+    await wrapper.trigger('click');
+
+    expect(wrapper.emitted('select')).toEqual([[{ title: 'Click me' }]]);
+  });
 });
 
 describe('TileGrid', () => {

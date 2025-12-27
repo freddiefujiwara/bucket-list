@@ -1,6 +1,12 @@
 <template>
   <div class="grid">
-    <TileCard v-for="item in items" :key="item.id" :item="item" @filter="$emit('filter', $event)" />
+    <TileCard
+      v-for="item in items"
+      :key="item.id"
+      :item="item"
+      @filter="$emit('filter', $event)"
+      @select="$emit('select', $event)"
+    />
   </div>
 </template>
 
@@ -14,7 +20,7 @@ defineProps({
   }
 });
 
-defineEmits(['filter']);
+defineEmits(['filter', 'select']);
 </script>
 
 <style scoped>

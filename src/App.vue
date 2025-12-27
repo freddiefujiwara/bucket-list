@@ -22,8 +22,39 @@
       <p v-if="error" class="state error">{{ error }}</p>
       <p v-else-if="loading" class="state">データを取得しています…</p>
       <p v-else-if="filteredTiles.length === 0" class="state">表示するデータがありません。</p>
-      <TileGrid v-else :items="filteredTiles" @filter="applyFilter" />
+      <TileGrid v-else :items="filteredTiles" @filter="applyFilter" @select="openTile" />
     </section>
+
+    <div v-if="selectedTile" class="modal" @click="closeTile">
+      <div class="modal-card" @click.stop>
+        <button class="modal-close" type="button" @click="closeTile">×</button>
+        <div v-if="selectedTile.imageUrl" class="modal-media">
+          <img :src="selectedTile.imageUrl" :alt="selectedTile.title" />
+        </div>
+        <div class="modal-body">
+          <h2>{{ selectedTile.title }}</h2>
+          <p v-if="selectedTile.note">{{ selectedTile.note }}</p>
+          <div class="modal-meta">
+            <span v-if="selectedTile.category" class="chip">{{ selectedTile.category }}</span>
+            <span v-if="selectedTile.targetAge" class="chip">
+              目標: {{ selectedTile.targetAge }}歳台
+            </span>
+          </div>
+          <p v-if="selectedTile.completedAt" class="modal-completed">
+            達成日: {{ selectedTile.completedAt }}
+          </p>
+          <a
+            v-if="selectedTile.link"
+            :href="selectedTile.link"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="modal-link"
+          >
+            詳細を見る
+          </a>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -38,6 +69,7 @@ const tiles = ref([]);
 const loading = ref(false);
 const error = ref('');
 const filter = ref({ type: '', value: '' });
+const selectedTile = ref(null);
 
 const filteredTiles = computed(() => {
   if (!filter.value.type || !filter.value.value) {
@@ -60,6 +92,7 @@ const loadTiles = async () => {
   loading.value = true;
   error.value = '';
   filter.value = { type: '', value: '' };
+  selectedTile.value = null;
   try {
     const data = await fetchJsonp(DATA_URL, { callbackParam: 'callback' });
     tiles.value = shuffleItems(normalizeItems(data));
@@ -79,6 +112,14 @@ const applyFilter = ({ type, value }) => {
 
 const clearFilter = () => {
   filter.value = { type: '', value: '' };
+};
+
+const openTile = (item) => {
+  selectedTile.value = item;
+};
+
+const closeTile = () => {
+  selectedTile.value = null;
 };
 </script>
 
@@ -178,6 +219,91 @@ h1 {
 .error {
   color: #b91c1c;
   background: #fee2e2;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 1000;
+}
+
+.modal-card {
+  background: #fff;
+  border-radius: 24px;
+  max-width: 720px;
+  width: min(90vw, 720px);
+  max-height: 90vh;
+  overflow: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border: none;
+  background: #111827;
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.modal-media {
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.modal-media img {
+  max-width: 100%;
+  max-height: 320px;
+  object-fit: contain;
+}
+
+.modal-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.modal-meta .chip {
+  background: #e5e7eb;
+  color: #374151;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.modal-completed {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.modal-link {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
 }
 
 @media (max-width: 720px) {

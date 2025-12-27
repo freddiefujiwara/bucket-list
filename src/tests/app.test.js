@@ -99,4 +99,27 @@ describe('App', () => {
 
     expect(wrapper.findAll('article.card')).toHaveLength(2);
   });
+
+  it('opens and closes the tile modal', async () => {
+    fetchJsonp.mockResolvedValueOnce([{ id: '1', title: 'A' }]);
+    normalizeItems.mockReturnValueOnce([
+      {
+        id: '1',
+        title: 'A',
+        note: 'note',
+        imageUrl: 'img.jpg'
+      }
+    ]);
+
+    const wrapper = mount(App);
+    await flushPromises();
+
+    await wrapper.find('article.card').trigger('click');
+
+    expect(wrapper.find('.modal').exists()).toBe(true);
+
+    await wrapper.find('.modal-close').trigger('click');
+
+    expect(wrapper.find('.modal').exists()).toBe(false);
+  });
 });
