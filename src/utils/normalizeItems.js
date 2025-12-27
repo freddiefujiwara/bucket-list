@@ -12,8 +12,8 @@ export const normalizeItems = (payload) => {
   return items.map((item, index) => ({
     id: item.id || item.uuid || item.key || `${index}-${fallbackTitle(item, index)}`,
     title: fallbackTitle(item, index),
-    description: item.description || item.detail || item.notes || '',
-    imageUrl: item.image || item.imageUrl || item.photo || '',
+    note: item.note || item.notes || item.description || item.detail || '',
+    imageUrl: item.image_url || item.image || item.imageUrl || item.photo || '',
     link: item.link || item.url || item.href || ''
   }));
 };

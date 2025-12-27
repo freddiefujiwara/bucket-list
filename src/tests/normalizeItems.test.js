@@ -4,14 +4,20 @@ import { normalizeItems } from '../utils/normalizeItems';
 describe('normalizeItems', () => {
   it('normalizes array payloads', () => {
     const result = normalizeItems([
-      { id: 'a1', title: 'Tokyo', description: 'Visit', image: 'img.jpg', link: 'https://example.com' }
+      {
+        id: 'a1',
+        title: 'Tokyo',
+        note: 'Visit',
+        image_url: 'img.jpg',
+        link: 'https://example.com'
+      }
     ]);
 
     expect(result).toEqual([
       {
         id: 'a1',
         title: 'Tokyo',
-        description: 'Visit',
+        note: 'Visit',
         imageUrl: 'img.jpg',
         link: 'https://example.com'
       }
@@ -20,13 +26,21 @@ describe('normalizeItems', () => {
 
   it('handles wrapped payloads and fallback fields', () => {
     const result = normalizeItems({
-      items: [{ name: 'Kyoto', detail: 'Temple', photo: 'photo.png', url: 'https://kyoto.jp' }]
+      items: [
+        {
+          name: 'Kyoto',
+          detail: 'Temple',
+          photo: 'photo.png',
+          url: 'https://kyoto.jp',
+          image_url: 'preferred.png'
+        }
+      ]
     });
 
     expect(result[0]).toMatchObject({
       title: 'Kyoto',
-      description: 'Temple',
-      imageUrl: 'photo.png',
+      note: 'Temple',
+      imageUrl: 'preferred.png',
       link: 'https://kyoto.jp'
     });
   });
@@ -41,5 +55,6 @@ describe('normalizeItems', () => {
 
     expect(result[0].id).toContain('Item 1');
     expect(result[0].title).toBe('Item 1');
+    expect(result[0].note).toBe('memo');
   });
 });

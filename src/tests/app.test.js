@@ -25,7 +25,7 @@ describe('App', () => {
 
   it('loads and renders tiles on mount', async () => {
     fetchJsonp.mockResolvedValueOnce([{ id: '1', title: 'Test' }]);
-    normalizeItems.mockReturnValueOnce([{ id: '1', title: 'Test', description: '' }]);
+    normalizeItems.mockReturnValueOnce([{ id: '1', title: 'Test', note: '' }]);
 
     const wrapper = mount(App);
     await flushPromises();
@@ -60,8 +60,8 @@ describe('App', () => {
       .mockResolvedValueOnce([{ id: '1', title: 'First' }])
       .mockResolvedValueOnce([{ id: '2', title: 'Second' }]);
     normalizeItems
-      .mockReturnValueOnce([{ id: '1', title: 'First', description: '' }])
-      .mockReturnValueOnce([{ id: '2', title: 'Second', description: '' }]);
+      .mockReturnValueOnce([{ id: '1', title: 'First', note: '' }])
+      .mockReturnValueOnce([{ id: '2', title: 'Second', note: '' }]);
 
     const wrapper = mount(App);
     await flushPromises();

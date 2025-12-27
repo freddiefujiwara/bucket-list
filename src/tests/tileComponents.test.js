@@ -9,7 +9,7 @@ describe('TileCard', () => {
       props: {
         item: {
           title: 'Climb Fuji',
-          description: 'Before summer ends',
+          note: 'Before summer ends',
           link: 'https://example.com'
         }
       }

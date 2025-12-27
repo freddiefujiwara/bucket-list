@@ -5,7 +5,7 @@
     </div>
     <div class="body">
       <h2>{{ item.title }}</h2>
-      <p v-if="item.description">{{ item.description }}</p>
+      <p v-if="item.note">{{ item.note }}</p>
       <a v-if="item.link" :href="item.link" target="_blank" rel="noopener noreferrer">
         詳細を見る
       </a>
