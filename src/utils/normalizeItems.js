@@ -14,6 +14,8 @@ export const normalizeItems = (payload) => {
     title: fallbackTitle(item),
     note: item.note || item.notes || item.description || item.detail || '',
     imageUrl: item.image_url || item.image || item.imageUrl || item.photo || '',
-    link: item.link || item.url || item.href || ''
+    link: item.link || item.url || item.href || '',
+    completed: Boolean(item.completed),
+    completedAt: item.completed_at || item.completedAt || ''
   }));
 };

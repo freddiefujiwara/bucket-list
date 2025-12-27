@@ -57,4 +57,11 @@ describe('normalizeItems', () => {
     expect(result[0].title).toBe('');
     expect(result[0].note).toBe('memo');
   });
+
+  it('maps completed fields', () => {
+    const result = normalizeItems([{ completed: true, completed_at: '2024-01-01' }]);
+
+    expect(result[0].completed).toBe(true);
+    expect(result[0].completedAt).toBe('2024-01-01');
+  });
 });

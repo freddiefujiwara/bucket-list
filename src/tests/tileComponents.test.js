@@ -33,6 +33,21 @@ describe('TileCard', () => {
     expect(wrapper.find('img').exists()).toBe(false);
     expect(wrapper.find('a').exists()).toBe(false);
   });
+
+  it('shows completed overlay when completed', () => {
+    const wrapper = mount(TileCard, {
+      props: {
+        item: {
+          title: 'Done',
+          completed: true,
+          completedAt: '2024-03-10'
+        }
+      }
+    });
+
+    expect(wrapper.classes()).toContain('completed');
+    expect(wrapper.text()).toContain('達成日: 2024-03-10');
+  });
 });
 
 describe('TileGrid', () => {

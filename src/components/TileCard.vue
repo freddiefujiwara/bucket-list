@@ -1,5 +1,5 @@
 <template>
-  <article class="card">
+  <article class="card" :class="{ completed: item.completed }">
     <div v-if="item.imageUrl" class="media">
       <img :src="item.imageUrl" :alt="item.title" loading="lazy" />
     </div>
@@ -9,6 +9,9 @@
       <a v-if="item.link" :href="item.link" target="_blank" rel="noopener noreferrer">
         詳細を見る
       </a>
+    </div>
+    <div v-if="item.completed && item.completedAt" class="overlay">
+      <span>達成日: {{ item.completedAt }}</span>
     </div>
   </article>
 </template>
@@ -31,6 +34,8 @@ defineProps({
   display: flex;
   flex-direction: column;
   min-height: 220px;
+  position: relative;
+  transition: filter 0.2s ease, transform 0.2s ease;
 }
 
 .media {
@@ -73,5 +78,20 @@ a {
   color: #2563eb;
   font-weight: 600;
   text-decoration: none;
+}
+
+.card.completed {
+  filter: grayscale(1);
+}
+
+.overlay {
+  position: absolute;
+  inset: auto 12px 12px 12px;
+  background: rgba(31, 41, 55, 0.8);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  text-align: center;
 }
 </style>
