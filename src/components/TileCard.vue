@@ -82,7 +82,12 @@ const isDataImage = (value) => typeof value === 'string' && value.startsWith('da
   flex-direction: column;
   min-height: 260px;
   position: relative;
-  transition: filter 0.2s ease, transform 0.2s ease;
+  transition: box-shadow 0.2s ease, filter 0.2s ease, transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.16);
 }
 
 .media {
