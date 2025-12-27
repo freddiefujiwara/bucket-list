@@ -28,8 +28,13 @@
     <div v-if="selectedTile" class="modal" @click="closeTile">
       <div class="modal-card" @click.stop>
         <button class="modal-close" type="button" @click="closeTile">×</button>
-        <div v-if="selectedTile.imageUrl" class="modal-media">
-          <img :src="selectedTile.imageUrl" :alt="selectedTile.title" />
+        <div class="modal-media">
+          <img
+            v-if="isDataImage(selectedTile.imageUrl)"
+            :src="selectedTile.imageUrl"
+            :alt="selectedTile.title"
+          />
+          <div v-else class="modal-placeholder" aria-label="NO IMAGE">NO IMAGE</div>
         </div>
         <div class="modal-body">
           <h2>{{ selectedTile.title }}</h2>
@@ -140,6 +145,8 @@ const formatTargetAge = (value) => {
   }
   return `目標: ${numeric}歳台`;
 };
+
+const isDataImage = (value) => typeof value === 'string' && value.startsWith('data');
 </script>
 
 <style scoped>
@@ -289,6 +296,20 @@ h1 {
   max-width: 100%;
   max-height: 320px;
   object-fit: contain;
+}
+
+.modal-placeholder {
+  width: 128px;
+  height: 128px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e5e7eb;
+  color: #6b7280;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  border-radius: 12px;
 }
 
 .modal-body {

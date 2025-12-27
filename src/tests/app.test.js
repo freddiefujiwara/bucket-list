@@ -118,6 +118,7 @@ describe('App', () => {
     await wrapper.find('article.card').trigger('click');
 
     expect(wrapper.find('.modal').exists()).toBe(true);
+    expect(wrapper.find('.modal-placeholder').text()).toBe('NO IMAGE');
     expect(wrapper.text()).toContain('達成日: 2023年11月12日');
 
     await wrapper.find('.modal-close').trigger('click');

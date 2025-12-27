@@ -10,7 +10,8 @@ describe('TileCard', () => {
         item: {
           title: 'Climb Fuji',
           note: 'Before summer ends',
-          link: 'https://example.com'
+          link: 'https://example.com',
+          imageUrl: 'data:image/png;base64,abc123'
         }
       }
     });
@@ -18,6 +19,8 @@ describe('TileCard', () => {
     expect(wrapper.text()).toContain('Climb Fuji');
     const anchor = wrapper.get('a');
     expect(anchor.attributes('href')).toBe('https://example.com');
+    expect(wrapper.find('img').exists()).toBe(true);
+    expect(wrapper.find('.placeholder').exists()).toBe(false);
   });
 
   it('omits optional fields when missing', () => {
@@ -29,8 +32,8 @@ describe('TileCard', () => {
       }
     });
 
-    expect(wrapper.find('img').exists()).toBe(false);
     expect(wrapper.find('a').exists()).toBe(false);
+    expect(wrapper.find('.placeholder').exists()).toBe(true);
   });
 
   it('shows completed overlay when completed', () => {
@@ -95,6 +98,20 @@ describe('TileCard', () => {
     await wrapper.trigger('click');
 
     expect(wrapper.emitted('select')).toEqual([[{ title: 'Click me' }]]);
+  });
+
+  it('shows placeholder when image is not a data URI', () => {
+    const wrapper = mount(TileCard, {
+      props: {
+        item: {
+          title: 'External image',
+          imageUrl: 'https://example.com/image.png'
+        }
+      }
+    });
+
+    expect(wrapper.find('img').exists()).toBe(false);
+    expect(wrapper.find('.placeholder').text()).toBe('NO IMAGE');
   });
 });
 
