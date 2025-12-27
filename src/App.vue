@@ -3,8 +3,8 @@
     <header class="header">
       <div>
         <p class="eyebrow">Bucket List</p>
-        <h1>やりたいことリスト</h1>
-        <p class="lead">Google Apps Script から取得したデータをタイル状に表示します。</p>
+        <h1>死ぬまでにやりたいことリスト</h1>
+        <p class="lead">人生で叶えたいことをタイルでまとめて眺められます。</p>
         <div v-if="filter.type" class="filter">
           <span>絞り込み:</span>
           <button type="button" class="filter-chip" @click="clearFilter">
