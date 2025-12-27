@@ -12,8 +12,7 @@ describe('normalizeItems', () => {
         note: 'Visit',
         image_url: 'img.jpg',
         completed: true,
-        completed_at: '2024-01-01',
-        link: 'https://example.com'
+        completed_at: '2024-01-01'
       }
     ]);
 
@@ -26,8 +25,7 @@ describe('normalizeItems', () => {
         note: 'Visit',
         imageUrl: 'img.jpg',
         completed: true,
-        completedAt: '2024-01-01',
-        link: 'https://example.com'
+        completedAt: '2024-01-01'
       }
     ]);
   });
@@ -44,7 +42,6 @@ describe('normalizeItems', () => {
     expect(result[0].title).toBe('');
     expect(result[0].note).toBe('');
     expect(result[0].imageUrl).toBe('');
-    expect(result[0].link).toBe('');
     expect(result[0].completed).toBe(false);
     expect(result[0].completedAt).toBe('');
     expect(result[0].category).toBe('');

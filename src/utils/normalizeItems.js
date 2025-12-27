@@ -11,7 +11,6 @@ export const normalizeItems = (payload) => {
     note: item.note ?? '',
     imageUrl: item.image_url ?? '',
     completed: Boolean(item.completed),
-    completedAt: item.completed_at ?? '',
-    link: item.link ?? ''
+    completedAt: item.completed_at ?? ''
   }));
 };
