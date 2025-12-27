@@ -1,7 +1,8 @@
 <template>
   <article class="card" :class="{ completed: item.completed }" @click="$emit('select', item)">
-    <div v-if="item.imageUrl" class="media">
-      <img :src="item.imageUrl" :alt="item.title" loading="lazy" />
+    <div class="media">
+      <img v-if="isDataImage(item.imageUrl)" :src="item.imageUrl" :alt="item.title" loading="lazy" />
+      <div v-else class="placeholder" aria-label="NO IMAGE">NO IMAGE</div>
     </div>
     <div class="body">
       <h2>{{ item.title }}</h2>
@@ -67,6 +68,8 @@ const formatTargetAge = (value) => {
   }
   return `目標: ${numeric}歳台`;
 };
+
+const isDataImage = (value) => typeof value === 'string' && value.startsWith('data');
 </script>
 
 <style scoped>
@@ -96,6 +99,20 @@ const formatTargetAge = (value) => {
   height: 128px;
   object-fit: contain;
   display: block;
+}
+
+.placeholder {
+  width: 128px;
+  height: 128px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e5e7eb;
+  color: #6b7280;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  border-radius: 12px;
 }
 
 .body {
