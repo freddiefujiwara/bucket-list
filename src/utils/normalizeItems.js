@@ -1,4 +1,4 @@
-const fallbackTitle = (item, index) => item.title || item.name || `Item ${index + 1}`;
+const fallbackTitle = (item) => item.title || item.name || '';
 
 export const normalizeItems = (payload) => {
   const items = Array.isArray(payload)
@@ -10,8 +10,8 @@ export const normalizeItems = (payload) => {
         : [];
 
   return items.map((item, index) => ({
-    id: item.id || item.uuid || item.key || `${index}-${fallbackTitle(item, index)}`,
-    title: fallbackTitle(item, index),
+    id: item.id || item.uuid || item.key || `idx-${index}`,
+    title: fallbackTitle(item),
     note: item.note || item.notes || item.description || item.detail || '',
     imageUrl: item.image_url || item.image || item.imageUrl || item.photo || '',
     link: item.link || item.url || item.href || ''

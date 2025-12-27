@@ -34,14 +34,18 @@ defineProps({
 }
 
 .media {
-  height: 140px;
-  overflow: hidden;
+  height: 176px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  padding: 16px;
 }
 
 .media img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: 128px;
+  height: 128px;
+  object-fit: contain;
   display: block;
 }
 

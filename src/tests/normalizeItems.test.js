@@ -53,8 +53,8 @@ describe('normalizeItems', () => {
   it('uses fallback ids and titles', () => {
     const result = normalizeItems([{ notes: 'memo' }]);
 
-    expect(result[0].id).toContain('Item 1');
-    expect(result[0].title).toBe('Item 1');
+    expect(result[0].id).toBe('idx-0');
+    expect(result[0].title).toBe('');
     expect(result[0].note).toBe('memo');
   });
 });
