@@ -1,48 +1,51 @@
 # Bucket List Tiles
 
-Google Apps Script の JSONP データを取得してタイル状に表示する Vue 3 アプリです。
+This is a small Vue 3 app. It loads data from Google Apps Script (JSONP) and shows it as tiles.
 
-## セットアップ
+You can see the live page here:
+https://freddiefujiwara.com/bucket-list/
+
+## Setup
 
 ```bash
 npm install
 ```
 
-## 開発サーバー
+## Run the app
 
 ```bash
 npm run dev
 ```
 
-## ビルド
+## Build
 
 ```bash
 npm run build
 ```
 
-## テスト
+## Test
 
 ```bash
 npm test
 ```
 
-## データ取得先の変更
+## Change the data URL
 
-`VITE_DATA_URL` に Apps Script のエンドポイントを指定できます。`callback` パラメータは不要です。
+Set `VITE_DATA_URL` to your Apps Script endpoint. Do not add the `callback` param.
 
 ```bash
 VITE_DATA_URL="https://script.google.com/macros/s/XXXX/exec" npm run dev
 ```
 
-## GitHub Pages デプロイ
+## Deploy to GitHub Pages
 
-`gh-pages` ブランチに `dist` を公開します。
+This publishes `dist` to the `gh-pages` branch.
 
 ```bash
 npm run deploy
 ```
 
-必要に応じて `VITE_BASE` にリポジトリ名のパスを指定してください。
+If your repo is not at the root, set `VITE_BASE` to the repo path.
 
 ```bash
 VITE_BASE="/your-repo-name/" npm run build
