@@ -83,7 +83,10 @@ describe('App', () => {
     const wrapper = mount(App);
     await flushPromises();
 
-    await wrapper.findAll('button.chip')[1].trigger('click');
+    const travelChip = wrapper
+      .findAll('button.chip')
+      .find((chip) => chip.text() === 'Travel');
+    await travelChip.trigger('click');
     await flushPromises();
 
     expect(wrapper.text()).toContain('絞り込み:');
