@@ -1,23 +1,17 @@
-const fallbackTitle = (item) => item.title || item.name || '';
-
 export const normalizeItems = (payload) => {
-  const items = Array.isArray(payload)
-    ? payload
-    : Array.isArray(payload?.items)
-      ? payload.items
-      : Array.isArray(payload?.data)
-        ? payload.data
-        : [];
+  if (!Array.isArray(payload)) {
+    return [];
+  }
 
-  return items.map((item, index) => ({
-    id: item.id || item.uuid || item.key || `idx-${index}`,
-    title: fallbackTitle(item),
-    note: item.note || item.notes || item.description || item.detail || '',
-    imageUrl: item.image_url || item.image || item.imageUrl || item.photo || '',
-    link: item.link || item.url || item.href || '',
+  return payload.map((item, index) => ({
+    id: item.id ?? `idx-${index}`,
+    category: item.category ?? '',
+    targetAge: item.target_age ?? '',
+    title: item.title ?? '',
+    note: item.note ?? '',
+    imageUrl: item.image_url ?? '',
     completed: Boolean(item.completed),
-    completedAt: item.completed_at || item.completedAt || '',
-    category: item.category || item.genre || '',
-    targetAge: item.target_age || item.targetAge || ''
+    completedAt: item.completed_at ?? '',
+    link: item.link ?? ''
   }));
 };
