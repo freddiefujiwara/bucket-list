@@ -107,7 +107,8 @@ describe('App', () => {
         id: '1',
         title: 'A',
         note: 'note',
-        imageUrl: 'img.jpg'
+        imageUrl: 'img.jpg',
+        completedAt: '2023-11-12T15:00:00.000Z'
       }
     ]);
 
@@ -117,6 +118,7 @@ describe('App', () => {
     await wrapper.find('article.card').trigger('click');
 
     expect(wrapper.find('.modal').exists()).toBe(true);
+    expect(wrapper.text()).toContain('達成日: 2023年11月12日');
 
     await wrapper.find('.modal-close').trigger('click');
 

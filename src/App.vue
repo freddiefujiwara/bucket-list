@@ -37,11 +37,11 @@
           <div class="modal-meta">
             <span v-if="selectedTile.category" class="chip">{{ selectedTile.category }}</span>
             <span v-if="selectedTile.targetAge" class="chip">
-              目標: {{ selectedTile.targetAge }}歳台
+              {{ formatTargetAge(selectedTile.targetAge) }}
             </span>
           </div>
           <p v-if="selectedTile.completedAt" class="modal-completed">
-            達成日: {{ selectedTile.completedAt }}
+            達成日: {{ formatDate(selectedTile.completedAt) }}
           </p>
           <a
             v-if="selectedTile.link"
@@ -120,6 +120,25 @@ const openTile = (item) => {
 
 const closeTile = () => {
   selectedTile.value = null;
+};
+
+const formatDate = (value) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}年${month}月${day}日`;
+};
+
+const formatTargetAge = (value) => {
+  const numeric = Number.parseInt(value, 10);
+  if (Number.isNaN(numeric)) {
+    return `目標: ${value}`;
+  }
+  return `目標: ${numeric}歳台`;
 };
 </script>
 

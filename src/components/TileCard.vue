@@ -23,7 +23,6 @@
           {{ formatTargetAge(item.targetAge) }}
         </button>
       </div>
-      <p v-if="item.note">{{ item.note }}</p>
       <a
         v-if="item.link"
         :href="item.link"

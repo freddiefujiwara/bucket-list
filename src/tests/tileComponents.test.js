@@ -16,7 +16,6 @@ describe('TileCard', () => {
     });
 
     expect(wrapper.text()).toContain('Climb Fuji');
-    expect(wrapper.text()).toContain('Before summer ends');
     const anchor = wrapper.get('a');
     expect(anchor.attributes('href')).toBe('https://example.com');
   });
