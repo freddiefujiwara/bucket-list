@@ -1,5 +1,5 @@
 <template>
-  <article class="card" :class="{ completed: item.completed }" @click="$emit('select', item)">
+  <article class="card" :class="cardClasses" @click="$emit('select', item)">
     <div class="media">
       <img v-if="isDataImage(item.imageUrl)" :src="item.imageUrl" :alt="item.title" loading="lazy" />
       <div v-else class="placeholder" aria-label="NO IMAGE">NO IMAGE</div>
@@ -41,7 +41,9 @@
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue';
+
+const props = defineProps({
   item: {
     type: Object,
     required: true
@@ -49,6 +51,26 @@ defineProps({
 });
 
 defineEmits(['filter', 'select']);
+
+const cardClasses = computed(() => {
+  if (props.item.completed) {
+    return { completed: true };
+  }
+  const age = Number.parseInt(props.item.targetAge, 10);
+  if (Number.isNaN(age)) {
+    return {};
+  }
+  if (age >= 40 && age < 50) {
+    return { 'priority-high': true };
+  }
+  if (age >= 50 && age < 60) {
+    return { 'priority-mid': true };
+  }
+  if (age >= 60) {
+    return { 'priority-low': true };
+  }
+  return {};
+});
 
 const formatDate = (value) => {
   const date = new Date(value);
@@ -82,12 +104,26 @@ const isDataImage = (value) => typeof value === 'string' && value.startsWith('da
   flex-direction: column;
   min-height: 260px;
   position: relative;
-  transition: box-shadow 0.2s ease, filter 0.2s ease, transform 0.2s ease;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
 }
 
 .card:hover {
   transform: translateY(-4px);
   box-shadow: 0 16px 36px rgba(15, 23, 42, 0.16);
+}
+
+.card.priority-high {
+  border-color: #ef4444;
+  box-shadow: 0 16px 36px rgba(239, 68, 68, 0.2);
+}
+
+.card.priority-mid {
+  border-color: #f97316;
+}
+
+.card.priority-low {
+  border-color: #eab308;
 }
 
 .media {
@@ -168,6 +204,7 @@ a {
 
 .card.completed {
   filter: grayscale(1);
+  border-color: #d1d5db;
 }
 
 .overlay {

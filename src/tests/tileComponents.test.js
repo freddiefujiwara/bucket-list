@@ -113,6 +113,44 @@ describe('TileCard', () => {
     expect(wrapper.find('img').exists()).toBe(false);
     expect(wrapper.find('.placeholder').text()).toBe('NO IMAGE');
   });
+
+  it.each([
+    { targetAge: 45, expected: 'priority-high' },
+    { targetAge: 55, expected: 'priority-mid' },
+    { targetAge: 65, expected: 'priority-low' },
+    { targetAge: 35, expected: null },
+    { targetAge: 'invalid', expected: null },
+  ])('applies priority class "$expected" for targetAge $targetAge', ({ targetAge, expected }) => {
+    const wrapper = mount(TileCard, {
+      props: {
+        item: {
+          title: 'Priority Test',
+          targetAge,
+        },
+      },
+    });
+    if (expected) {
+      expect(wrapper.classes()).toContain(expected);
+    } else {
+      expect(wrapper.classes()).not.toContain('priority-high');
+      expect(wrapper.classes()).not.toContain('priority-mid');
+      expect(wrapper.classes()).not.toContain('priority-low');
+    }
+  });
+
+  it('does not apply priority classes to completed cards', () => {
+    const wrapper = mount(TileCard, {
+      props: {
+        item: {
+          title: 'Completed Priority',
+          targetAge: 45,
+          completed: true,
+        },
+      },
+    });
+    expect(wrapper.classes()).toContain('completed');
+    expect(wrapper.classes()).not.toContain('priority-high');
+  });
 });
 
 describe('TileGrid', () => {
