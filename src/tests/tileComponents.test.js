@@ -1,9 +1,19 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi, afterEach, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import TileCard from '../components/TileCard.vue';
 import TileGrid from '../components/TileGrid.vue';
 
 describe('TileCard', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    const mockDate = new Date('2024-08-15T12:00:00.000Z'); // 実年齢が44歳になる日付
+    vi.setSystemTime(mockDate);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('renders title, description, and link', () => {
     const wrapper = mount(TileCard, {
       props: {
@@ -49,6 +59,69 @@ describe('TileCard', () => {
 
     expect(wrapper.classes()).toContain('completed');
     expect(wrapper.text()).toContain('達成日: 2024年03月10日');
+  });
+
+  it('shows original date string if date is invalid', () => {
+    const wrapper = mount(TileCard, {
+      props: {
+        item: {
+          title: 'Invalid Date',
+          completed: true,
+          completedAt: 'invalid-date'
+        }
+      }
+    });
+    expect(wrapper.text()).toContain('達成日: invalid-date');
+  });
+
+  it('calculates age correctly just after the birthday', () => {
+    // This test ensures the branch condition in calculateAge is covered
+    // where the current month is after the birth month.
+    const mockDate = new Date('2024-09-03T12:00:00.000Z'); // Birthday is 09-02. Actual age is 45. Normalized is 40.
+    vi.setSystemTime(mockDate);
+
+    const wrapper = mount(TileCard, {
+      props: {
+        item: {
+          title: 'Post-birthday test',
+          targetAge: 50 // Should be priority-mid
+        }
+      }
+    });
+
+    expect(wrapper.classes()).toContain('priority-mid');
+  });
+
+  it.each([
+    { targetAge: 40, expectedClass: 'priority-high' },
+    { targetAge: 50, expectedClass: 'priority-mid' },
+    { targetAge: 60, expectedClass: 'priority-low' },
+    { targetAge: 'invalid', expectedClass: 'priority-low' },
+    { targetAge: undefined, expectedClass: 'priority-low' }
+  ])('applies correct priority class for targetAge $targetAge', ({ targetAge, expectedClass }) => {
+    const wrapper = mount(TileCard, {
+      props: {
+        item: {
+          title: 'Priority Test',
+          targetAge
+        }
+      }
+    });
+    expect(wrapper.classes()).toContain(expectedClass);
+  });
+
+  it('applies completed class and no priority class if item is completed', () => {
+    const wrapper = mount(TileCard, {
+      props: {
+        item: {
+          title: 'Completed item',
+          targetAge: 40,
+          completed: true
+        }
+      }
+    });
+    expect(wrapper.classes()).toContain('completed');
+    expect(wrapper.classes()).not.toContain('priority-high');
   });
 
   it('emits filter events for category and target age', async () => {

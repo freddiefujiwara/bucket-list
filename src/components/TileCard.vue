@@ -1,5 +1,5 @@
 <template>
-  <article class="card" :class="{ completed: item.completed }" @click="$emit('select', item)">
+  <article class="card" :class="cardClasses" @click="$emit('select', item)">
     <div class="media">
       <img v-if="isDataImage(item.imageUrl)" :src="item.imageUrl" :alt="item.title" loading="lazy" />
       <div v-else class="placeholder" aria-label="NO IMAGE">NO IMAGE</div>
@@ -41,7 +41,9 @@
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue';
+
+const props = defineProps({
   item: {
     type: Object,
     required: true
@@ -49,6 +51,46 @@ defineProps({
 });
 
 defineEmits(['filter', 'select']);
+
+const BIRTH_DATE = new Date('1979-09-02T00:00:00+09:00');
+
+function calculateAge(birthDate, nowDate) {
+  const birthYear = birthDate.getFullYear();
+  const birthMonth = birthDate.getMonth();
+  const birthDay = birthDate.getDate();
+
+  const nowYear = nowDate.getFullYear();
+  const nowMonth = nowDate.getMonth();
+  const nowDay = nowDate.getDate();
+
+  let age = nowYear - birthYear;
+  if (nowMonth < birthMonth || (nowMonth === birthMonth && nowDay < birthDay)) {
+    age--;
+  }
+  return age;
+}
+
+const cardClasses = computed(() => {
+  if (props.item.completed) {
+    return { completed: true };
+  }
+
+  const age = Number.parseInt(props.item.targetAge, 10);
+  if (Number.isNaN(age)) {
+    return { 'priority-low': true };
+  }
+
+  const actualAge = calculateAge(BIRTH_DATE, new Date());
+  const normalizedTargetAge = Math.floor(actualAge / 10) * 10;
+
+  if (age <= normalizedTargetAge) {
+    return { 'priority-high': true };
+  }
+  if (age <= normalizedTargetAge + 10) {
+    return { 'priority-mid': true };
+  }
+  return { 'priority-low': true };
+});
 
 const formatDate = (value) => {
   const date = new Date(value);
@@ -180,5 +222,31 @@ a {
   font-size: 0.85rem;
   text-align: center;
   pointer-events: none;
+}
+
+@keyframes pulse-danger {
+  0% {
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08), 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  70% {
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08), 0 0 0 12px rgba(239, 68, 68, 0);
+  }
+  100% {
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08), 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+.card.priority-high {
+  border: 2px solid #ef4444; /* red-500 */
+  animation: pulse-danger 2s infinite;
+}
+
+.card.priority-mid {
+  border: 2px solid #f97316; /* orange-500 */
+  box-shadow: 0 8px 20px rgba(249, 115, 22, 0.2);
+}
+
+.card.priority-low {
+  border: 2px solid #3b82f6; /* blue-500 */
 }
 </style>
