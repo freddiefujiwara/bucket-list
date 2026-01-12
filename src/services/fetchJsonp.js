@@ -23,7 +23,13 @@ export const fetchJsonp = (url, { callbackParam = 'callback', timeout = DEFAULT_
 
     window[callbackName] = (data) => {
       cleanup();
-      resolve(data);
+      if (data && typeof data.error === 'object' && data.error !== null) {
+        const { code, message } = data.error;
+        const errorMessage = `API Error${code ? ` ${code}` : ''}: ${message || 'Unknown error'}`;
+        reject(new Error(errorMessage));
+      } else {
+        resolve(data);
+      }
     };
 
     script.onerror = () => {

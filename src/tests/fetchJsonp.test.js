@@ -43,4 +43,50 @@ describe('fetchJsonp', () => {
 
     await expect(promise).rejects.toThrow('JSONPのタイムアウトが発生しました');
   });
+
+  describe('API error handling', () => {
+    it('rejects with a formatted message when API returns a standard error', async () => {
+      const promise = fetchJsonp('https://example.com/data');
+      const script = document.querySelector('script');
+      const callbackName = new URL(script.src).searchParams.get('callback');
+      const apiError = { error: { code: 404, message: 'Not Found' } };
+
+      window[callbackName](apiError);
+
+      await expect(promise).rejects.toThrow('API Error 404: Not Found');
+    });
+
+    it('rejects with a message when API error has no code', async () => {
+      const promise = fetchJsonp('https://example.com/data');
+      const script = document.querySelector('script');
+      const callbackName = new URL(script.src).searchParams.get('callback');
+      const apiError = { error: { message: 'Something went wrong' } };
+
+      window[callbackName](apiError);
+
+      await expect(promise).rejects.toThrow('API Error: Something went wrong');
+    });
+
+    it('rejects with a default message when API error has no message', async () => {
+      const promise = fetchJsonp('https://example.com/data');
+      const script = document.querySelector('script');
+      const callbackName = new URL(script.src).searchParams.get('callback');
+      const apiError = { error: { code: 500 } };
+
+      window[callbackName](apiError);
+
+      await expect(promise).rejects.toThrow('API Error 500: Unknown error');
+    });
+
+    it('rejects with a default message for a malformed error object', async () => {
+      const promise = fetchJsonp('https://example.com/data');
+      const script = document.querySelector('script');
+      const callbackName = new URL(script.src).searchParams.get('callback');
+      const apiError = { error: {} };
+
+      window[callbackName](apiError);
+
+      await expect(promise).rejects.toThrow('API Error: Unknown error');
+    });
+  });
 });
