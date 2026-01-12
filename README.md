@@ -1,52 +1,112 @@
-# Bucket List Tiles
+# Bucket List: A Dynamic Tiled Gallery
 
-This is a small Vue 3 app. It loads data from Google Apps Script (JSONP) and shows it as tiles.
+人生でやりたいことリストを、タイル形式で美しく表示するウェブアプリケーションです。Google Apps Scriptからデータを取得し、フィルタリングや詳細表示が可能です。
 
-You can see the live page here:
-https://freddiefujiwara.com/bucket-list/
+[ライブデモはこちら](https://freddiefujiwara.com/bucket-list/)
 
-## Setup
+## Features
 
-```bash
-npm install
-```
+- **タイル表示**: やりたいことリストをタイル形式で表示
+- **詳細表示**: 各タイルをクリックすると、詳細情報をモーダルで表示
+- **フィルタリング**: カテゴリや目標年齢で表示するタイルを絞り込み
+- **レスポンシブデザイン**: スマートフォンやデスクトップなど、さまざまなデバイスに対応
 
-## Run the app
+## Technology Stack
+
+- **Vue 3**: リアクティブなUIを構築するためのプログレッシブフレームワーク
+- **Vite**: 高速な開発サーバーとビルドツール
+- **Vitest**: Vite上で動作する単体テストフレームワーク
+
+## Getting Started
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (v18 or later)
+- [npm](https://www.npmjs.com/)
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/bucket-list.git
+   ```
+2. Navigate to the project directory:
+   ```bash
+   cd bucket-list
+   ```
+3. Install the dependencies:
+   ```bash
+   npm install
+   ```
+
+### Running the Development Server
+
+To start the local development server, run the following command:
 
 ```bash
 npm run dev
 ```
 
-## Build
+The application will be available at `http://localhost:5173`.
+
+### Building for Production
+
+To build the application for production, run:
 
 ```bash
 npm run build
 ```
 
-## Test
+The output files will be generated in the `dist` directory.
+
+### Running Tests
+
+To run the unit tests, use the following command:
 
 ```bash
 npm test
 ```
 
-## Change the data URL
+## Configuration
 
-Set `VITE_DATA_URL` to your Apps Script endpoint. Do not add the `callback` param.
+### Data Source
+
+The application fetches data from a JSONP endpoint. You can specify the URL of your data source by setting the `VITE_DATA_URL` environment variable.
 
 ```bash
 VITE_DATA_URL="https://script.google.com/macros/s/XXXX/exec" npm run dev
 ```
 
-## Deploy to GitHub Pages
+**Note:** Do not include the `callback` parameter in the URL.
 
-This publishes `dist` to the `gh-pages` branch.
+### Deployment
 
-```bash
-npm run deploy
-```
+This project can be deployed to GitHub Pages.
 
-If your repo is not at the root, set `VITE_BASE` to the repo path.
+1. **Build the application.** If your repository is not at the root of your custom domain, you may need to set the `VITE_BASE` environment variable to the repository path.
+   ```bash
+   VITE_BASE="/your-repo-name/" npm run build
+   ```
+2. **Deploy.** The following command will publish the contents of the `dist` directory to the `gh-pages` branch.
+   ```bash
+   npm run deploy
+   ```
 
-```bash
-VITE_BASE="/your-repo-name/" npm run build
+## Data Structure
+
+このアプリケーションは、Google Apps ScriptなどのJSONPエンドポイントからデータを取得します。データソースは、以下の形式のJSONオブジェクトの配列を返す必要があります。
+
+```json
+[
+  {
+    "id": "一意のID",
+    "category": "カテゴリ名",
+    "target_age": "目標年齢",
+    "title": "タイトル",
+    "note": "メモ",
+    "image_url": "画像のURL",
+    "completed": true,
+    "completed_at": "2023-10-27"
+  }
+]
 ```
