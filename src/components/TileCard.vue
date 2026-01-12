@@ -52,24 +52,44 @@ const props = defineProps({
 
 defineEmits(['filter', 'select']);
 
+const BIRTH_DATE = new Date('1979-09-02T00:00:00+09:00');
+
+function calculateAge(birthDate, nowDate) {
+  const birthYear = birthDate.getFullYear();
+  const birthMonth = birthDate.getMonth();
+  const birthDay = birthDate.getDate();
+
+  const nowYear = nowDate.getFullYear();
+  const nowMonth = nowDate.getMonth();
+  const nowDay = nowDate.getDate();
+
+  let age = nowYear - birthYear;
+  if (nowMonth < birthMonth || (nowMonth === birthMonth && nowDay < birthDay)) {
+    age--;
+  }
+  return age;
+}
+
 const cardClasses = computed(() => {
   if (props.item.completed) {
     return { completed: true };
   }
+
   const age = Number.parseInt(props.item.targetAge, 10);
   if (Number.isNaN(age)) {
-    return {};
-  }
-  if (age >= 40 && age < 50) {
-    return { 'priority-high': true };
-  }
-  if (age >= 50 && age < 60) {
-    return { 'priority-mid': true };
-  }
-  if (age >= 60) {
     return { 'priority-low': true };
   }
-  return {};
+
+  const actualAge = calculateAge(BIRTH_DATE, new Date());
+  const normalizedTargetAge = Math.floor(actualAge / 10) * 10;
+
+  if (age <= normalizedTargetAge) {
+    return { 'priority-high': true };
+  }
+  if (age <= normalizedTargetAge + 10) {
+    return { 'priority-mid': true };
+  }
+  return { 'priority-low': true };
 });
 
 const formatDate = (value) => {
@@ -104,26 +124,12 @@ const isDataImage = (value) => typeof value === 'string' && value.startsWith('da
   flex-direction: column;
   min-height: 260px;
   position: relative;
-  transition: all 0.2s ease;
-  border: 2px solid transparent;
+  transition: box-shadow 0.2s ease, filter 0.2s ease, transform 0.2s ease;
 }
 
 .card:hover {
   transform: translateY(-4px);
   box-shadow: 0 16px 36px rgba(15, 23, 42, 0.16);
-}
-
-.card.priority-high {
-  border-color: #ef4444;
-  box-shadow: 0 16px 36px rgba(239, 68, 68, 0.2);
-}
-
-.card.priority-mid {
-  border-color: #f97316;
-}
-
-.card.priority-low {
-  border-color: #eab308;
 }
 
 .media {
@@ -204,7 +210,6 @@ a {
 
 .card.completed {
   filter: grayscale(1);
-  border-color: #d1d5db;
 }
 
 .overlay {
@@ -217,5 +222,31 @@ a {
   font-size: 0.85rem;
   text-align: center;
   pointer-events: none;
+}
+
+@keyframes pulse-danger {
+  0% {
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08), 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  70% {
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08), 0 0 0 12px rgba(239, 68, 68, 0);
+  }
+  100% {
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08), 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+.card.priority-high {
+  border: 2px solid #ef4444; /* red-500 */
+  animation: pulse-danger 2s infinite;
+}
+
+.card.priority-mid {
+  border: 2px solid #f97316; /* orange-500 */
+  box-shadow: 0 8px 20px rgba(249, 115, 22, 0.2);
+}
+
+.card.priority-low {
+  border: 2px solid #3b82f6; /* blue-500 */
 }
 </style>

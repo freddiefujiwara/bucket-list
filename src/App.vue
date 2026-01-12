@@ -68,7 +68,7 @@ import { computed, onMounted, ref } from 'vue';
 import TileGrid from './components/TileGrid.vue';
 import { fetchJsonp } from './services/fetchJsonp';
 import { normalizeItems } from './utils/normalizeItems';
-import { sortItems } from './utils/sortItems';
+import { shuffleItems } from './utils/shuffleItems';
 
 const tiles = ref([]);
 const loading = ref(false);
@@ -100,7 +100,7 @@ const loadTiles = async () => {
   selectedTile.value = null;
   try {
     const data = await fetchJsonp(DATA_URL, { callbackParam: 'callback' });
-    tiles.value = sortItems(normalizeItems(data));
+    tiles.value = shuffleItems(normalizeItems(data));
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'データ取得に失敗しました。';
     tiles.value = [];
