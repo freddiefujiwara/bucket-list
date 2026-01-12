@@ -1,21 +1,21 @@
 # Bucket List: A Dynamic Tiled Gallery
 
-人生でやりたいことリストを、タイル形式で美しく表示するウェブアプリケーションです。Google Apps Scriptからデータを取得し、フィルタリングや詳細表示が可能です。
+This web app shows your bucket list as a beautiful gallery of tiles. It gets data from a Google Apps Script and lets you filter items and see more details.
 
-[ライブデモはこちら](https://freddiefujiwara.com/bucket-list/)
+[View the Live Demo](https://freddiefujiwara.com/bucket-list/)
 
 ## Features
 
-- **タイル表示**: やりたいことリストをタイル形式で表示
-- **詳細表示**: 各タイルをクリックすると、詳細情報をモーダルで表示
-- **フィルタリング**: カテゴリや目標年齢で表示するタイルを絞り込み
-- **レスポンシブデザイン**: スマートフォンやデスクトップなど、さまざまなデバイスに対応
+- **Tile Display**: Shows your bucket list items as tiles.
+- **Detailed View**: Click a tile to see more details in a popup.
+- **Filtering**: Filter tiles by category or target age.
+- **Responsive Design**: Works well on different devices, like phones and desktops.
 
 ## Technology Stack
 
-- **Vue 3**: リアクティブなUIを構築するためのプログレッシブフレームワーク
-- **Vite**: 高速な開発サーバーとビルドツール
-- **Vitest**: Vite上で動作する単体テストフレームワーク
+- **Vue 3**: A progressive framework for building reactive user interfaces.
+- **Vite**: A fast development server and build tool.
+- **Vitest**: A unit testing framework that runs on Vite.
 
 ## Getting Started
 
@@ -94,17 +94,17 @@ This project can be deployed to GitHub Pages.
 
 ## Data Structure
 
-このアプリケーションは、Google Apps ScriptなどのJSONPエンドポイントからデータを取得します。データソースは、以下の形式のJSONオブジェクトの配列を返す必要があります。
+This app gets data from a JSONP endpoint, like a Google Apps Script. The data source needs to be an array of JSON objects with this structure:
 
 ```json
 [
   {
-    "id": "一意のID",
-    "category": "カテゴリ名",
-    "target_age": "目標年齢",
-    "title": "タイトル",
-    "note": "メモ",
-    "image_url": "画像のURL",
+    "id": "Unique ID",
+    "category": "Category Name",
+    "target_age": "Target Age",
+    "title": "Title",
+    "note": "Note",
+    "image_url": "Image URL",
     "completed": true,
     "completed_at": "2023-10-27"
   }
