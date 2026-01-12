@@ -93,6 +93,6 @@ This project is configured for deployment to GitHub Pages.
 
 ## Relationship with the Backend
 
-This frontend application is designed to work with the [Bucket List API](https://github.com/your-username/bucket-list-api), a serverless backend built with Google Apps Script. The frontend fetches data from the API and displays it to the user.
+This frontend application is designed to work with the [Bucket List API](https://github.com/freddiefujiwara/bucket-list-gas/tree/main), a serverless backend built with Google Apps Script. The frontend fetches data from the API and displays it to the user.
 
 This separation of concerns allows for independent development, testing, and deployment of the frontend and backend.
