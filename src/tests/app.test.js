@@ -100,29 +100,137 @@ describe('App', () => {
     expect(wrapper.findAll('article.card')).toHaveLength(2);
   });
 
-  it('opens and closes the tile modal', async () => {
-    fetchJsonp.mockResolvedValueOnce([{ id: '1', title: 'A' }]);
+  it('filters by targetAge and clears filter', async () => {
+    fetchJsonp.mockResolvedValueOnce([
+      { id: '1', title: 'A', targetAge: 20 },
+      { id: '2', title: 'B', targetAge: 30 },
+    ]);
     normalizeItems.mockReturnValueOnce([
-      {
-        id: '1',
-        title: 'A',
-        note: 'note',
-        imageUrl: 'img.jpg',
-        completedAt: '2023-11-12T15:00:00.000Z'
-      }
+      { id: '1', title: 'A', targetAge: 20 },
+      { id: '2', title: 'B', targetAge: 30 },
     ]);
 
     const wrapper = mount(App);
     await flushPromises();
 
-    await wrapper.find('article.card').trigger('click');
+    // Click on a targetAge chip (assuming TileCard renders it)
+    const ageChip = wrapper.findAll('button.chip').find((chip) => chip.text().includes('20'));
+    await ageChip.trigger('click');
+    await flushPromises();
 
-    expect(wrapper.find('.modal').exists()).toBe(true);
-    expect(wrapper.find('.modal-placeholder').text()).toBe('NO IMAGE');
-    expect(wrapper.text()).toContain('達成日: 2023年11月12日');
+    expect(wrapper.text()).toContain('絞り込み:');
+    expect(wrapper.text()).toContain('対象年齢 - 20');
+    expect(wrapper.findAll('article.card')).toHaveLength(1);
+    expect(wrapper.text()).toContain('A');
 
-    await wrapper.find('.modal-close').trigger('click');
+    await wrapper.get('.filter-chip').trigger('click');
+    await flushPromises();
+    expect(wrapper.findAll('article.card')).toHaveLength(2);
+  });
 
-    expect(wrapper.find('.modal').exists()).toBe(false);
+  it('returns all tiles when filter type is invalid', async () => {
+    normalizeItems.mockReturnValueOnce([
+      { id: '1', title: 'A' },
+      { id: '2', title: 'B' },
+    ]);
+
+    const wrapper = mount(App);
+    await flushPromises();
+
+    // Directly set a filter that should be ignored
+    await wrapper.vm.applyFilter({ type: 'invalid', value: 'anything' });
+    await flushPromises();
+    expect(wrapper.findAll('article.card')).toHaveLength(2);
+  });
+
+  it('handles non-Error rejection', async () => {
+    fetchJsonp.mockRejectedValueOnce('network error');
+    const wrapper = mount(App);
+    await flushPromises();
+    expect(wrapper.text()).toContain('データ取得に失敗しました。');
+  });
+
+  describe('modal interactions', () => {
+    const mockTileData = {
+      id: '1',
+      title: 'Modal Test',
+      note: 'A detailed note.',
+      imageUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+      completedAt: '2023-11-12T15:00:00.000Z',
+      category: 'Test',
+      targetAge: 30,
+      link: 'http://example.com',
+    };
+
+    beforeEach(() => {
+      fetchJsonp.mockResolvedValueOnce([{}]);
+      normalizeItems.mockReturnValueOnce([mockTileData]);
+    });
+
+    it('opens modal with full data', async () => {
+      const wrapper = mount(App);
+      await flushPromises();
+      await wrapper.find('article.card').trigger('click');
+
+      expect(wrapper.find('.modal').exists()).toBe(true);
+      expect(wrapper.find('h2').text()).toBe('Modal Test');
+      expect(wrapper.text()).toContain('A detailed note.');
+      expect(wrapper.find('.modal-media img').attributes('src')).toBe(mockTileData.imageUrl);
+      expect(wrapper.text()).toContain('達成日: 2023年11月12日');
+      expect(wrapper.text()).toContain('Test');
+      expect(wrapper.text()).toContain('目標: 30歳台');
+      expect(wrapper.find('a.modal-link').attributes('href')).toBe(mockTileData.link);
+    });
+
+    it('handles data with missing optional fields', async () => {
+      const minimalData = { id: '2', title: 'Minimal' };
+      normalizeItems.mockReset().mockReturnValueOnce([minimalData]);
+
+      const wrapper = mount(App);
+      await flushPromises();
+      await wrapper.find('article.card').trigger('click');
+
+      expect(wrapper.find('.modal').exists()).toBe(true);
+      expect(wrapper.find('h2').text()).toBe('Minimal');
+      expect(wrapper.find('.modal-placeholder').exists()).toBe(true);
+      expect(wrapper.find('.modal-body').text()).not.toContain('達成日:');
+      expect(wrapper.find('.modal-link').exists()).toBe(false);
+    });
+
+    it('handles invalid dates and ages', async () => {
+      const invalidData = {
+        id: '3',
+        title: 'Invalid',
+        completedAt: 'invalid-date',
+        targetAge: 'abc',
+      };
+      normalizeItems.mockReset().mockReturnValueOnce([invalidData]);
+      const wrapper = mount(App);
+      await flushPromises();
+      await wrapper.find('article.card').trigger('click');
+
+      expect(wrapper.text()).toContain('達成日: invalid-date');
+      expect(wrapper.text()).toContain('目標: abc');
+    });
+
+    it('closes modal on background click', async () => {
+      const wrapper = mount(App);
+      await flushPromises();
+      await wrapper.find('article.card').trigger('click');
+      expect(wrapper.find('.modal').exists()).toBe(true);
+
+      await wrapper.find('.modal').trigger('click');
+      expect(wrapper.find('.modal').exists()).toBe(false);
+    });
+
+    it('closes modal on close button click', async () => {
+      const wrapper = mount(App);
+      await flushPromises();
+      await wrapper.find('article.card').trigger('click');
+      expect(wrapper.find('.modal').exists()).toBe(true);
+
+      await wrapper.find('.modal-close').trigger('click');
+      expect(wrapper.find('.modal').exists()).toBe(false);
+    });
   });
 });

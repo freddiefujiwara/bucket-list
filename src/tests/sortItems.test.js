@@ -1,4 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import {
+  describe, expect, it, vi,
+} from 'vitest';
 import { sortItems } from '../utils/sortItems';
 
 describe('sortItems', () => {
@@ -17,6 +19,7 @@ describe('sortItems', () => {
     { id: 9, completed: true, completedAt: '2023-05-20' }, // Newest
     { id: 10, completed: true, completedAt: 'invalid-date' }, // End
     { id: 11, completed: true }, // End
+    { id: 12, completed: true, completedAt: null }, // End
   ];
 
   it('should not mutate the original array', () => {
@@ -29,7 +32,6 @@ describe('sortItems', () => {
   it('should place uncompleted items before completed items', () => {
     const result = sortItems(mockItems);
     const uncompletedCount = mockItems.filter((i) => i.completed !== true).length;
-    const completedCount = mockItems.filter((i) => i.completed === true).length;
 
     expect(result.length).toBe(mockItems.length);
     expect(result.slice(0, uncompletedCount).every((i) => i.completed !== true)).toBe(true);
@@ -40,10 +42,21 @@ describe('sortItems', () => {
     const result = sortItems(mockItems);
     const completedItems = result.filter((item) => item.completed === true);
 
-    const expectedOrder = [8, 9, 10, 11];
+    const expectedOrder = [8, 9, 10, 11, 12];
     const actualOrder = completedItems.map((item) => item.id);
 
     expect(actualOrder).toEqual(expectedOrder);
+  });
+
+  it('should handle tie-breaking for invalid completedAt dates', () => {
+    const items = [
+      { id: 1, completed: true, completedAt: 'invalid' },
+      { id: 2, completed: true, completedAt: null },
+      { id: 3, completed: true, completedAt: '2023-01-01' },
+      { id: 4, completed: true, completedAt: undefined },
+    ];
+    const result = sortItems(items);
+    expect(result.map((i) => i.id)).toEqual([3, 1, 2, 4]);
   });
 
   it('should sort uncompleted items by targetAge (ascending)', () => {
@@ -53,8 +66,8 @@ describe('sortItems', () => {
     // Extract ages, converting to numbers for comparison
     const ages = uncompleted.map((i) => parseInt(i.targetAge, 10));
     const sortedAges = [...ages].sort((a, b) => {
-      const numA = isNaN(a) ? Infinity : a;
-      const numB = isNaN(b) ? Infinity : b;
+      const numA = Number.isNaN(a) ? Infinity : a;
+      const numB = Number.isNaN(b) ? Infinity : b;
       return numA - numB;
     });
 
@@ -71,35 +84,31 @@ describe('sortItems', () => {
     const uncompleted = result.filter((i) => i.completed !== true);
 
     // Items with invalid/missing age should be at the end of the uncompleted list
-    const invalidAgeItems = uncompleted.filter(i => isNaN(parseInt(i.targetAge, 10)));
-    expect(invalidAgeItems.map(i => i.id).sort()).toEqual([4, 6].sort());
+    const invalidAgeItems = uncompleted.filter((i) => Number.isNaN(parseInt(i.targetAge, 10)));
+    expect(invalidAgeItems.map((i) => i.id).sort()).toEqual([4, 6].sort());
 
     const lastTwoUncompleted = uncompleted.slice(-2);
-    expect(lastTwoUncompleted.map(i => i.id).sort()).toEqual([4, 6].sort());
+    expect(lastTwoUncompleted.map((i) => i.id).sort()).toEqual([4, 6].sort());
   });
 
   it('should shuffle items within the same targetAge group', () => {
-    // Run multiple times to check for randomness
-    const runs = Array(10)
-      .fill(null)
-      .map(() => sortItems(mockItems));
+    const randomSpy = vi.spyOn(Math, 'random');
+    const items = [
+      { id: 1, targetAge: 20, completed: false },
+      { id: 2, targetAge: 20, completed: false },
+      { id: 3, targetAge: 20, completed: false },
+    ];
 
-    const ordersOfAge25 = runs.map((result) =>
-      result.filter((i) => i.targetAge === 25).map((i) => i.id)
-    );
+    // Mock random to be deterministic
+    randomSpy.mockReturnValue(0.8);
+    const result1 = sortItems(JSON.parse(JSON.stringify(items)));
+    expect(result1.map((i) => i.id)).toEqual([1, 2, 3]);
 
-    // Check if the order has changed at least once across runs
-    const isRandom = ordersOfAge25.some(
-      (order) => JSON.stringify(order) !== JSON.stringify(ordersOfAge25[0])
-    );
+    randomSpy.mockReturnValue(0.1);
+    const result2 = sortItems(JSON.parse(JSON.stringify(items)));
+    expect(result2.map((i) => i.id)).toEqual([2, 3, 1]);
 
-    // If there's more than one item, it should be possible for the order to change
-    const group = mockItems.filter((i) => i.targetAge === 25);
-    if (group.length > 1) {
-      expect(isRandom).toBe(true);
-    } else {
-      expect(isRandom).toBe(false);
-    }
+    randomSpy.mockRestore();
   });
 
   it('should handle an empty array', () => {
