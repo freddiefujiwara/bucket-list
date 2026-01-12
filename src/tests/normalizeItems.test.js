@@ -5,9 +5,9 @@ describe('normalizeItems', () => {
   it('normalizes array payloads', () => {
     const result = normalizeItems([
       {
-        id: 'a1',
+        id: 1,
         category: 'Travel',
-        target_age: 'Adult',
+        target_age: 30,
         title: 'Tokyo',
         note: 'Visit',
         image_url: 'img.jpg',
@@ -18,9 +18,9 @@ describe('normalizeItems', () => {
 
     expect(result).toEqual([
       {
-        id: 'a1',
+        id: 1,
         category: 'Travel',
-        targetAge: 'Adult',
+        targetAge: 30,
         title: 'Tokyo',
         note: 'Visit',
         imageUrl: 'img.jpg',
@@ -43,8 +43,36 @@ describe('normalizeItems', () => {
     expect(result[0].note).toBe('');
     expect(result[0].imageUrl).toBe('');
     expect(result[0].completed).toBe(false);
-    expect(result[0].completedAt).toBe('');
+    expect(result[0].completedAt).toBe(null);
     expect(result[0].category).toBe('');
-    expect(result[0].targetAge).toBe('');
+    expect(result[0].targetAge).toBe(null);
+  });
+
+  it('handles not completed items', () => {
+    const result = normalizeItems([
+      {
+        id: 1,
+        category: 'Travel',
+        target_age: 30,
+        title: 'Tokyo',
+        note: 'Visit',
+        image_url: 'img.jpg',
+        completed: false,
+        completed_at: null
+      }
+    ]);
+
+    expect(result).toEqual([
+      {
+        id: 1,
+        category: 'Travel',
+        targetAge: 30,
+        title: 'Tokyo',
+        note: 'Visit',
+        imageUrl: 'img.jpg',
+        completed: false,
+        completedAt: null
+      }
+    ]);
   });
 });

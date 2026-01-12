@@ -6,11 +6,11 @@ export const normalizeItems = (payload) => {
   return payload.map((item, index) => ({
     id: item.id ?? `idx-${index}`,
     category: item.category ?? '',
-    targetAge: item.target_age ?? '',
+    targetAge: item.target_age ?? null,
     title: item.title ?? '',
     note: item.note ?? '',
     imageUrl: item.image_url ?? '',
-    completed: Boolean(item.completed),
-    completedAt: item.completed_at ?? ''
+    completed: item.completed ?? false,
+    completedAt: item.completed_at ?? null
   }));
 };
