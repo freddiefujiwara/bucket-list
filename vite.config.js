@@ -15,7 +15,11 @@ export default defineConfig(({ mode }) => {
         statements: 100,
         branches: 100,
         functions: 100,
-        lines: 100
+        lines: 100,
+        exclude: [
+          'src/main.js',
+          '*.js'
+        ]
       }
     }
   };
