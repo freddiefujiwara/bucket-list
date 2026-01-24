@@ -3,6 +3,18 @@ import { mount } from '@vue/test-utils';
 import TileCard from '../components/TileCard.vue';
 import TileGrid from '../components/TileGrid.vue';
 
+const makeItem = (overrides = {}) => ({
+  title: 'Item',
+  ...overrides
+});
+
+const mountCard = (itemOverrides = {}) =>
+  mount(TileCard, {
+    props: {
+      item: makeItem(itemOverrides)
+    }
+  });
+
 describe('TileCard', () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -15,15 +27,11 @@ describe('TileCard', () => {
   });
 
   it('renders title, description, and link', () => {
-    const wrapper = mount(TileCard, {
-      props: {
-        item: {
-          title: 'Climb Fuji',
-          note: 'Before summer ends',
-          link: 'https://example.com',
-          imageUrl: 'data:image/png;base64,abc123'
-        }
-      }
+    const wrapper = mountCard({
+      title: 'Climb Fuji',
+      note: 'Before summer ends',
+      link: 'https://example.com',
+      imageUrl: 'data:image/png;base64,abc123'
     });
 
     expect(wrapper.text()).toContain('Climb Fuji');
@@ -34,27 +42,17 @@ describe('TileCard', () => {
   });
 
   it('omits optional fields when missing', () => {
-    const wrapper = mount(TileCard, {
-      props: {
-        item: {
-          title: 'No extras'
-        }
-      }
-    });
+    const wrapper = mountCard({ title: 'No extras' });
 
     expect(wrapper.find('a').exists()).toBe(false);
     expect(wrapper.find('.placeholder').exists()).toBe(true);
   });
 
   it('shows completed overlay when completed', () => {
-    const wrapper = mount(TileCard, {
-      props: {
-        item: {
-          title: 'Done',
-          completed: true,
-          completedAt: '2024-03-10'
-        }
-      }
+    const wrapper = mountCard({
+      title: 'Done',
+      completed: true,
+      completedAt: '2024-03-10'
     });
 
     expect(wrapper.classes()).toContain('completed');
@@ -62,14 +60,10 @@ describe('TileCard', () => {
   });
 
   it('shows original date string if date is invalid', () => {
-    const wrapper = mount(TileCard, {
-      props: {
-        item: {
-          title: 'Invalid Date',
-          completed: true,
-          completedAt: 'invalid-date'
-        }
-      }
+    const wrapper = mountCard({
+      title: 'Invalid Date',
+      completed: true,
+      completedAt: 'invalid-date'
     });
     expect(wrapper.text()).toContain('達成日: invalid-date');
   });
@@ -80,13 +74,9 @@ describe('TileCard', () => {
     const mockDate = new Date('2024-09-03T12:00:00.000Z'); // Birthday is 09-02. Actual age is 45. Normalized is 40.
     vi.setSystemTime(mockDate);
 
-    const wrapper = mount(TileCard, {
-      props: {
-        item: {
-          title: 'Post-birthday test',
-          targetAge: 50 // Should be priority-mid
-        }
-      }
+    const wrapper = mountCard({
+      title: 'Post-birthday test',
+      targetAge: 50 // Should be priority-mid
     });
 
     expect(wrapper.classes()).toContain('priority-mid');
@@ -99,40 +89,28 @@ describe('TileCard', () => {
     { targetAge: 'invalid', expectedClass: 'priority-low' },
     { targetAge: undefined, expectedClass: 'priority-low' }
   ])('applies correct priority class for targetAge $targetAge', ({ targetAge, expectedClass }) => {
-    const wrapper = mount(TileCard, {
-      props: {
-        item: {
-          title: 'Priority Test',
-          targetAge
-        }
-      }
+    const wrapper = mountCard({
+      title: 'Priority Test',
+      targetAge
     });
     expect(wrapper.classes()).toContain(expectedClass);
   });
 
   it('applies completed class and no priority class if item is completed', () => {
-    const wrapper = mount(TileCard, {
-      props: {
-        item: {
-          title: 'Completed item',
-          targetAge: 40,
-          completed: true
-        }
-      }
+    const wrapper = mountCard({
+      title: 'Completed item',
+      targetAge: 40,
+      completed: true
     });
     expect(wrapper.classes()).toContain('completed');
     expect(wrapper.classes()).not.toContain('priority-high');
   });
 
   it('emits filter events for category and target age', async () => {
-    const wrapper = mount(TileCard, {
-      props: {
-        item: {
-          title: 'Tagged',
-          category: 'Food',
-          targetAge: 'Kids'
-        }
-      }
+    const wrapper = mountCard({
+      title: 'Tagged',
+      category: 'Food',
+      targetAge: 'Kids'
     });
 
     const buttons = wrapper.findAll('button.chip');
@@ -147,26 +125,16 @@ describe('TileCard', () => {
   });
 
   it('formats numeric target age as decade', () => {
-    const wrapper = mount(TileCard, {
-      props: {
-        item: {
-          title: 'Plan',
-          targetAge: 50
-        }
-      }
+    const wrapper = mountCard({
+      title: 'Plan',
+      targetAge: 50
     });
 
     expect(wrapper.text()).toContain('目標: 50歳台');
   });
 
   it('emits select when card is clicked', async () => {
-    const wrapper = mount(TileCard, {
-      props: {
-        item: {
-          title: 'Click me'
-        }
-      }
-    });
+    const wrapper = mountCard({ title: 'Click me' });
 
     await wrapper.trigger('click');
 
@@ -174,13 +142,9 @@ describe('TileCard', () => {
   });
 
   it('shows placeholder when image is not a data URI', () => {
-    const wrapper = mount(TileCard, {
-      props: {
-        item: {
-          title: 'External image',
-          imageUrl: 'https://example.com/image.png'
-        }
-      }
+    const wrapper = mountCard({
+      title: 'External image',
+      imageUrl: 'https://example.com/image.png'
     });
 
     expect(wrapper.find('img').exists()).toBe(false);
