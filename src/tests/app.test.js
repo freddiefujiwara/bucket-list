@@ -13,6 +13,19 @@ vi.mock('../utils/normalizeItems', () => ({
 const { fetchJsonp } = await import('../services/fetchJsonp');
 const { normalizeItems } = await import('../utils/normalizeItems');
 
+const mountApp = async () => {
+  const wrapper = mount(App);
+  await flushPromises();
+  return wrapper;
+};
+
+const makeTile = (overrides = {}) => ({
+  id: '1',
+  title: 'Test',
+  note: '',
+  ...overrides
+});
+
 describe('App', () => {
   beforeEach(() => {
     fetchJsonp.mockReset();
@@ -24,11 +37,10 @@ describe('App', () => {
   });
 
   it('loads and renders tiles on mount', async () => {
-    fetchJsonp.mockResolvedValueOnce([{ id: '1', title: 'Test' }]);
-    normalizeItems.mockReturnValueOnce([{ id: '1', title: 'Test', note: '' }]);
+    fetchJsonp.mockResolvedValueOnce([makeTile()]);
+    normalizeItems.mockReturnValueOnce([makeTile()]);
 
-    const wrapper = mount(App);
-    await flushPromises();
+    const wrapper = await mountApp();
 
     expect(fetchJsonp).toHaveBeenCalledTimes(1);
     expect(wrapper.text()).toContain('Test');
@@ -39,8 +51,7 @@ describe('App', () => {
     fetchJsonp.mockResolvedValueOnce([]);
     normalizeItems.mockReturnValueOnce([]);
 
-    const wrapper = mount(App);
-    await flushPromises();
+    const wrapper = await mountApp();
 
     expect(wrapper.text()).toContain('表示するデータがありません');
   });
@@ -49,8 +60,7 @@ describe('App', () => {
     fetchJsonp.mockRejectedValueOnce(new Error('boom'));
     normalizeItems.mockReturnValueOnce([]);
 
-    const wrapper = mount(App);
-    await flushPromises();
+    const wrapper = await mountApp();
 
     expect(wrapper.text()).toContain('boom');
   });
@@ -60,11 +70,10 @@ describe('App', () => {
       .mockResolvedValueOnce([{ id: '1', title: 'First' }])
       .mockResolvedValueOnce([{ id: '2', title: 'Second' }]);
     normalizeItems
-      .mockReturnValueOnce([{ id: '1', title: 'First', note: '' }])
-      .mockReturnValueOnce([{ id: '2', title: 'Second', note: '' }]);
+      .mockReturnValueOnce([makeTile({ id: '1', title: 'First' })])
+      .mockReturnValueOnce([makeTile({ id: '2', title: 'Second' })]);
 
-    const wrapper = mount(App);
-    await flushPromises();
+    const wrapper = await mountApp();
 
     await wrapper.get('button').trigger('click');
     await flushPromises();
@@ -76,12 +85,11 @@ describe('App', () => {
   it('filters by category and clears filter', async () => {
     fetchJsonp.mockResolvedValueOnce([{ id: '1', title: 'A' }]);
     normalizeItems.mockReturnValueOnce([
-      { id: '1', title: 'A', category: 'Travel' },
-      { id: '2', title: 'B', category: 'Food' }
+      makeTile({ id: '1', title: 'A', category: 'Travel' }),
+      makeTile({ id: '2', title: 'B', category: 'Food' })
     ]);
 
-    const wrapper = mount(App);
-    await flushPromises();
+    const wrapper = await mountApp();
 
     const travelChip = wrapper
       .findAll('button.chip')
@@ -103,15 +111,14 @@ describe('App', () => {
   it('filters by targetAge and clears filter', async () => {
     fetchJsonp.mockResolvedValueOnce([
       { id: '1', title: 'A', targetAge: 20 },
-      { id: '2', title: 'B', targetAge: 30 },
+      { id: '2', title: 'B', targetAge: 30 }
     ]);
     normalizeItems.mockReturnValueOnce([
-      { id: '1', title: 'A', targetAge: 20 },
-      { id: '2', title: 'B', targetAge: 30 },
+      makeTile({ id: '1', title: 'A', targetAge: 20 }),
+      makeTile({ id: '2', title: 'B', targetAge: 30 })
     ]);
 
-    const wrapper = mount(App);
-    await flushPromises();
+    const wrapper = await mountApp();
 
     // Click on a targetAge chip (assuming TileCard renders it)
     const ageChip = wrapper.findAll('button.chip').find((chip) => chip.text().includes('20'));
@@ -130,12 +137,11 @@ describe('App', () => {
 
   it('returns all tiles when filter type is invalid', async () => {
     normalizeItems.mockReturnValueOnce([
-      { id: '1', title: 'A' },
-      { id: '2', title: 'B' },
+      makeTile({ id: '1', title: 'A' }),
+      makeTile({ id: '2', title: 'B' })
     ]);
 
-    const wrapper = mount(App);
-    await flushPromises();
+    const wrapper = await mountApp();
 
     // Directly set a filter that should be ignored
     await wrapper.vm.applyFilter({ type: 'invalid', value: 'anything' });
@@ -145,8 +151,7 @@ describe('App', () => {
 
   it('handles non-Error rejection', async () => {
     fetchJsonp.mockRejectedValueOnce('network error');
-    const wrapper = mount(App);
-    await flushPromises();
+    const wrapper = await mountApp();
     expect(wrapper.text()).toContain('データ取得に失敗しました。');
   });
 
@@ -168,8 +173,7 @@ describe('App', () => {
     });
 
     it('opens modal with full data', async () => {
-      const wrapper = mount(App);
-      await flushPromises();
+      const wrapper = await mountApp();
       await wrapper.find('article.card').trigger('click');
 
       expect(wrapper.find('.modal').exists()).toBe(true);
@@ -186,8 +190,7 @@ describe('App', () => {
       const minimalData = { id: '2', title: 'Minimal' };
       normalizeItems.mockReset().mockReturnValueOnce([minimalData]);
 
-      const wrapper = mount(App);
-      await flushPromises();
+      const wrapper = await mountApp();
       await wrapper.find('article.card').trigger('click');
 
       expect(wrapper.find('.modal').exists()).toBe(true);
@@ -205,8 +208,7 @@ describe('App', () => {
         targetAge: 'abc',
       };
       normalizeItems.mockReset().mockReturnValueOnce([invalidData]);
-      const wrapper = mount(App);
-      await flushPromises();
+      const wrapper = await mountApp();
       await wrapper.find('article.card').trigger('click');
 
       expect(wrapper.text()).toContain('達成日: invalid-date');
@@ -214,8 +216,7 @@ describe('App', () => {
     });
 
     it('closes modal on background click', async () => {
-      const wrapper = mount(App);
-      await flushPromises();
+      const wrapper = await mountApp();
       await wrapper.find('article.card').trigger('click');
       expect(wrapper.find('.modal').exists()).toBe(true);
 
@@ -224,8 +225,7 @@ describe('App', () => {
     });
 
     it('closes modal on close button click', async () => {
-      const wrapper = mount(App);
-      await flushPromises();
+      const wrapper = await mountApp();
       await wrapper.find('article.card').trigger('click');
       expect(wrapper.find('.modal').exists()).toBe(true);
 

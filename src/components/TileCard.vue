@@ -1,5 +1,5 @@
 <template>
-  <article class="card" :class="cardClasses" @click="$emit('select', item)">
+  <article class="card" :class="cardClasses" @click="handleSelect">
     <div class="media">
       <img v-if="isDataImage(item.imageUrl)" :src="item.imageUrl" :alt="item.title" loading="lazy" />
       <div v-else class="placeholder" aria-label="NO IMAGE">NO IMAGE</div>
@@ -10,7 +10,7 @@
             v-if="item.category"
             class="chip"
             type="button"
-            @click.stop="$emit('filter', { type: 'category', value: item.category })"
+            @click.stop="handleCategoryFilter"
           >
             {{ item.category }}
           </button>
@@ -18,7 +18,7 @@
             v-if="item.targetAge"
             class="chip"
             type="button"
-            @click.stop="$emit('filter', { type: 'targetAge', value: item.targetAge })"
+            @click.stop="handleTargetAgeFilter"
           >
             {{ formatTargetAge(item.targetAge) }}
           </button>
@@ -42,6 +42,9 @@
 
 <script setup>
 import { computed } from 'vue';
+import { getCardClasses } from '../utils/cardPriority';
+import { formatDate, formatTargetAge } from '../utils/formatters';
+import { isDataImage } from '../utils/image';
 
 const props = defineProps({
   item: {
@@ -50,68 +53,21 @@ const props = defineProps({
   }
 });
 
-defineEmits(['filter', 'select']);
+const emit = defineEmits(['filter', 'select']);
 
-const BIRTH_DATE = new Date('1979-09-02T00:00:00+09:00');
+const cardClasses = computed(() => getCardClasses(props.item));
 
-function calculateAge(birthDate, nowDate) {
-  const birthYear = birthDate.getFullYear();
-  const birthMonth = birthDate.getMonth();
-  const birthDay = birthDate.getDate();
-
-  const nowYear = nowDate.getFullYear();
-  const nowMonth = nowDate.getMonth();
-  const nowDay = nowDate.getDate();
-
-  let age = nowYear - birthYear;
-  if (nowMonth < birthMonth || (nowMonth === birthMonth && nowDay < birthDay)) {
-    age--;
-  }
-  return age;
-}
-
-const cardClasses = computed(() => {
-  if (props.item.completed) {
-    return { completed: true };
-  }
-
-  const age = Number.parseInt(props.item.targetAge, 10);
-  if (Number.isNaN(age)) {
-    return { 'priority-low': true };
-  }
-
-  const actualAge = calculateAge(BIRTH_DATE, new Date());
-  const normalizedTargetAge = Math.floor(actualAge / 10) * 10;
-
-  if (age <= normalizedTargetAge) {
-    return { 'priority-high': true };
-  }
-  if (age <= normalizedTargetAge + 10) {
-    return { 'priority-mid': true };
-  }
-  return { 'priority-low': true };
-});
-
-const formatDate = (value) => {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}年${month}月${day}日`;
+const handleSelect = () => {
+  emit('select', props.item);
 };
 
-const formatTargetAge = (value) => {
-  const numeric = Number.parseInt(value, 10);
-  if (Number.isNaN(numeric)) {
-    return `目標: ${value}`;
-  }
-  return `目標: ${numeric}歳台`;
+const handleCategoryFilter = () => {
+  emit('filter', { type: 'category', value: props.item.category });
 };
 
-const isDataImage = (value) => typeof value === 'string' && value.startsWith('data');
+const handleTargetAgeFilter = () => {
+  emit('filter', { type: 'targetAge', value: props.item.targetAge });
+};
 </script>
 
 <style scoped>

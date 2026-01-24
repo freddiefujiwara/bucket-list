@@ -4,8 +4,8 @@
       v-for="item in items"
       :key="item.id"
       :item="item"
-      @filter="$emit('filter', $event)"
-      @select="$emit('select', $event)"
+      @filter="handleFilter"
+      @select="handleSelect"
     />
   </div>
 </template>
@@ -20,7 +20,15 @@ defineProps({
   }
 });
 
-defineEmits(['filter', 'select']);
+const emit = defineEmits(['filter', 'select']);
+
+const handleFilter = (payload) => {
+  emit('filter', payload);
+};
+
+const handleSelect = (payload) => {
+  emit('select', payload);
+};
 </script>
 
 <style scoped>
