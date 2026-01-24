@@ -1,13 +1,14 @@
 # Repository Guidelines
 
-## Project Structure & Module Organization
-- `index.html` bootstraps the Vite app.
-- `src/main.js` mounts the Vue app; `src/App.vue` is the root view.
-- `src/components/` holds UI building blocks like tiles and grids.
-- `src/services/` contains API helpers (e.g., `fetchJsonp`).
-- `src/utils/` houses data transforms (normalization, sorting).
-- `src/tests/` contains Vitest unit tests named `*.test.js`.
-- `src/style.css` provides global styling.
+## Project Structure
+- `index.html`: Main HTML entry point.
+- `src/main.js`: Mounts the root Vue app.
+- `src/App.vue`: The root Vue component.
+- `src/components/`: Reusable UI components.
+- `src/services/`: API-related helpers (e.g., `fetchJsonp`).
+- `src/utils/`: Data transformation utilities.
+- `src/tests/`: Vitest unit tests.
+- `src/style.css`: Global stylesheets.
 
 ## Build, Test, and Development Commands
 - `npm run dev`: start the local Vite dev server.
@@ -27,7 +28,8 @@
 ## Testing Guidelines
 - Frameworks: Vitest + `@vue/test-utils` with `jsdom`.
 - Tests live in `src/tests/` and mirror feature names (e.g., `app.test.js`).
-- Keep coverage high; this project has aimed for 100% in recent work.
+- The project enforces **100% test coverage**. This is checked automatically in CI.
+  - The following files are excluded from this requirement: `src/main.js` and any `*.js` files in the root directory.
 - Run `npm test` for quick checks and `npm run test:coverage` before PRs.
 
 ## Commit & Pull Request Guidelines
@@ -37,4 +39,4 @@
 
 ## Configuration & Deployment Notes
 - Set `VITE_DATA_URL` to point at the JSONP backend endpoint.
-- Set `VITE_BASE="/repo-name/"` when deploying to GitHub Pages.
+- Set `VITE_BASE="/your-repo-name/"` when deploying to GitHub Pages.
