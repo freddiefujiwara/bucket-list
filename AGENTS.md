@@ -5,6 +5,7 @@
 - `src/main.js`: Mounts the root Vue app.
 - `src/App.vue`: The root Vue component.
 - `src/components/`: Reusable UI components.
+- `src/composables/`: Reusable Vue composables.
 - `src/services/`: API-related helpers (e.g., `fetchJsonp`).
 - `src/utils/`: Data transformation utilities.
 - `src/tests/`: Vitest unit tests.
