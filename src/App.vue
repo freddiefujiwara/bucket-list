@@ -13,9 +13,15 @@
           </button>
         </div>
       </div>
-      <button class="refresh" type="button" @click="loadTiles" :disabled="loading">
-        {{ loading ? '読み込み中…' : '再読み込み' }}
-      </button>
+      <div class="actions">
+        <button class="refresh" type="button" @click="loadTiles" :disabled="loading">
+          {{ loading ? '読み込み中…' : '再読み込み' }}
+        </button>
+        <button class="copy" type="button" @click="copyTilesJson" :disabled="loading">
+          コピー
+        </button>
+        <span v-if="copyDone" class="copy-done">コピー完了</span>
+      </div>
     </header>
 
     <section class="content">
@@ -44,7 +50,9 @@ const {
   applyFilter,
   clearFilter,
   openTile,
-  closeTile
+  closeTile,
+  copyDone,
+  copyTilesJson
 } = useTiles();
 </script>
 
@@ -127,6 +135,34 @@ h1 {
 .refresh:not(:disabled):hover {
   transform: translateY(-1px);
   box-shadow: 0 8px 16px rgba(37, 99, 235, 0.2);
+}
+
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.copy {
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  padding: 12px 18px;
+  background: #fff;
+  color: #1f2937;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.copy:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.copy-done {
+  color: #15803d;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 .content {
