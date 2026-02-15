@@ -1,8 +1,9 @@
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { DATA_URL } from '../config';
 import { fetchJsonp } from '../services/fetchJsonp';
 import { normalizeItems } from '../utils/normalizeItems';
 import { sortItems } from '../utils/sortItems';
+import { stripImageRelatedData } from '../utils/stripImageData';
 
 export const useTiles = () => {
   const tiles = ref([]);
@@ -10,6 +11,9 @@ export const useTiles = () => {
   const error = ref('');
   const filter = ref({ type: '', value: '' });
   const selectedTile = ref(null);
+  const rawData = ref([]);
+  const copyDone = ref(false);
+  let copyDoneTimer = null;
 
   const filteredTiles = computed(() => {
     if (!filter.value.type || !filter.value.value) {
@@ -35,9 +39,11 @@ export const useTiles = () => {
     resetView();
     try {
       const data = await fetchJsonp(DATA_URL, { callbackParam: 'callback' });
+      rawData.value = data;
       tiles.value = sortItems(normalizeItems(data));
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'データ取得に失敗しました。';
+      rawData.value = [];
       tiles.value = [];
     } finally {
       loading.value = false;
@@ -62,6 +68,27 @@ export const useTiles = () => {
     selectedTile.value = null;
   };
 
+  const copyTilesJson = async () => {
+    const sanitizedData = stripImageRelatedData(rawData.value);
+    const jsonText = JSON.stringify(sanitizedData, null, 2);
+    await navigator.clipboard.writeText(jsonText);
+
+    copyDone.value = true;
+    if (copyDoneTimer) {
+      clearTimeout(copyDoneTimer);
+    }
+    copyDoneTimer = setTimeout(() => {
+      copyDone.value = false;
+      copyDoneTimer = null;
+    }, 3000);
+  };
+
+  onUnmounted(() => {
+    if (copyDoneTimer) {
+      clearTimeout(copyDoneTimer);
+    }
+  });
+
   return {
     loading,
     error,
@@ -72,6 +99,8 @@ export const useTiles = () => {
     applyFilter,
     clearFilter,
     openTile,
-    closeTile
+    closeTile,
+    copyDone,
+    copyTilesJson
   };
 };

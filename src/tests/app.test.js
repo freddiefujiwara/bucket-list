@@ -75,11 +75,63 @@ describe('App', () => {
 
     const wrapper = await mountApp();
 
-    await wrapper.get('button').trigger('click');
+    await wrapper.get('button.refresh').trigger('click');
     await flushPromises();
 
     expect(fetchJsonp).toHaveBeenCalledTimes(2);
     expect(wrapper.text()).toContain('Second');
+  });
+
+
+  it('copies sanitized JSON and shows success message', async () => {
+    vi.useFakeTimers();
+    const writeText = vi.fn().mockResolvedValue();
+    Object.assign(navigator, {
+      clipboard: { writeText }
+    });
+
+    const apiResponse = [
+      {
+        id: '1',
+        title: 'First',
+        image_url: 'https://example.com/image.jpg',
+        thumbnail: 'https://example.com/thumb.jpg',
+        nested: {
+          thumbnail_url: 'https://example.com/thumb2.jpg',
+          note: 'keep'
+        }
+      }
+    ];
+    fetchJsonp.mockResolvedValueOnce(apiResponse);
+    normalizeItems.mockReturnValueOnce([makeTile({ id: '1', title: 'First' })]);
+
+    const wrapper = await mountApp();
+    const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
+
+    await wrapper.get('button.copy').trigger('click');
+    await wrapper.get('button.copy').trigger('click');
+
+    expect(writeText).toHaveBeenCalledWith(JSON.stringify([
+      {
+        id: '1',
+        title: 'First',
+        nested: {
+          note: 'keep'
+        }
+      }
+    ], null, 2));
+    expect(clearTimeoutSpy).toHaveBeenCalledTimes(1);
+    expect(wrapper.text()).toContain('コピー完了');
+
+    vi.advanceTimersByTime(3000);
+    await flushPromises();
+    expect(wrapper.text()).not.toContain('コピー完了');
+
+    await wrapper.get('button.copy').trigger('click');
+    wrapper.unmount();
+    expect(clearTimeoutSpy).toHaveBeenCalledTimes(2);
+
+    vi.useRealTimers();
   });
 
   it('filters by category and clears filter', async () => {
