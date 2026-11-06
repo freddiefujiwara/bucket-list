@@ -24,7 +24,7 @@ jobs:
     - run: npm run build
     - name: Build staging variant into dist/staging
       env:
-        VITE_BASE: "/bucket-list/staging/"
+        VITE_BASE: "/bucket-list-admin/staging/"
         VITE_STAGING: "1"
         VITE_DATA_URL: "https://script.google.com/macros/s/AKfycbylntjD8K8_9bIHFy2edMYYXoufciAFL5uxKcGiHuqKujif8nGoWu7HKoXG7t2p-Lcg/exec"
       run: |
