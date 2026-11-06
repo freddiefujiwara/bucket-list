@@ -6,8 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:staging": "vite build --outDir dist-staging",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:staging": "playwright test e2e/staging.check.js",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "deploy": "npm run build && gh-pages -d dist"
@@ -16,6 +18,7 @@
     "vue": "^3.4.38"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@vitejs/plugin-vue": "^5.1.3",
     "@vue/test-utils": "^2.4.6",
     "@vitest/coverage-v8": "^2.1.1",
