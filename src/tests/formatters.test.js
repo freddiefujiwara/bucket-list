@@ -2,10 +2,16 @@ import { describe, expect, it } from 'vitest';
 import { formatDate, formatTargetAge } from '../utils/formatters';
 
 describe('formatDate', () => {
-  it('formats ISO date strings using UTC parts', () => {
+  it('formats ISO date strings using Asia/Tokyo parts', () => {
     const input = '2023-11-12T15:00:00.000Z';
 
-    expect(formatDate(input)).toBe('2023年11月12日');
+    expect(formatDate(input)).toBe('2023年11月13日');
+  });
+
+  it('shows the Japan calendar date for late-night UTC timestamps', () => {
+    const input = '2023-10-26T15:00:00.000Z';
+
+    expect(formatDate(input)).toBe('2023年10月27日');
   });
 
   it('returns the original value for invalid dates', () => {

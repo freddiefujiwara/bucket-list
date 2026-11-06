@@ -1,18 +1,52 @@
 :root {
-  font-family: "Noto Sans JP", system-ui, sans-serif;
-  line-height: 1.5;
+  --bg: #fbfaf7;
+  --surface: #ffffff;
+  --ink: #221d16;
+  --ink-2: #5d5546;
+  --ink-3: #8a8071;
+  --line: #e3ddd0;
+  --accent: #b23a1f;
+  --accent-strong: #8f2a12;
+  --accent-soft: #f7e9e2;
+  --error: #b91c1c;
+  --error-bg: #fee2e2;
+
+  font-family: "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", sans-serif;
+  line-height: 1.6;
   font-weight: 400;
-  color: #1f2a37;
-  background-color: #f5f7fb;
+  color: var(--ink);
+  background-color: var(--bg);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17140f;
+    --surface: #211c15;
+    --ink: #f2ecdf;
+    --ink-2: #c2b8a4;
+    --ink-3: #948a77;
+    --line: #3a332a;
+    --accent: #ec7a52;
+    --accent-strong: #f0936f;
+    --accent-soft: #33231b;
+    --error: #fca5a5;
+    --error-bg: #3a1d1d;
+  }
 }
 
 * {
   box-sizing: border-box;
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
 }
 
 #app {

@@ -1,5 +1,5 @@
 import {
-  describe, expect, it, vi,
+  describe, expect, it,
 } from 'vitest';
 import { sortItems } from '../utils/sortItems';
 
@@ -91,24 +91,38 @@ describe('sortItems', () => {
     expect(lastTwoUncompleted.map((i) => i.id).sort()).toEqual([4, 6].sort());
   });
 
-  it('should shuffle items within the same targetAge group', () => {
-    const randomSpy = vi.spyOn(Math, 'random');
+  it('should order items within the same targetAge group by id, deterministically', () => {
     const items = [
+      { id: 3, targetAge: 20, completed: false },
       { id: 1, targetAge: 20, completed: false },
       { id: 2, targetAge: 20, completed: false },
-      { id: 3, targetAge: 20, completed: false },
     ];
 
-    // Mock random to be deterministic
-    randomSpy.mockReturnValue(0.8);
     const result1 = sortItems(JSON.parse(JSON.stringify(items)));
-    expect(result1.map((i) => i.id)).toEqual([1, 2, 3]);
-
-    randomSpy.mockReturnValue(0.1);
     const result2 = sortItems(JSON.parse(JSON.stringify(items)));
-    expect(result2.map((i) => i.id)).toEqual([2, 3, 1]);
 
-    randomSpy.mockRestore();
+    expect(result1.map((i) => i.id)).toEqual([1, 2, 3]);
+    expect(result2.map((i) => i.id)).toEqual([1, 2, 3]);
+  });
+
+  it('should keep input order for non-numeric ids in the same group', () => {
+    const items = [
+      { id: 'x', targetAge: 20, completed: false },
+      { id: 'y', targetAge: 20, completed: false },
+    ];
+
+    const result = sortItems(items);
+    expect(result.map((i) => i.id)).toEqual(['x', 'y']);
+  });
+
+  it('should order completed items with equal dates by id', () => {
+    const items = [
+      { id: 2, completed: true, completedAt: '2023-06-01' },
+      { id: 1, completed: true, completedAt: '2023-06-01' },
+    ];
+
+    const result = sortItems(items);
+    expect(result.map((i) => i.id)).toEqual([1, 2]);
   });
 
   it('should handle an empty array', () => {

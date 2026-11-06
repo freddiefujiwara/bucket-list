@@ -3,7 +3,7 @@
     <div class="modal-card" @click.stop>
       <button class="modal-close" type="button" @click="close">×</button>
       <div class="modal-media">
-        <img v-if="isDataImage(item.imageUrl)" :src="item.imageUrl" :alt="item.title" />
+        <img v-if="isDisplayableImage(item.imageUrl)" :src="item.imageUrl" :alt="item.title" />
         <div v-else class="modal-placeholder" aria-label="NO IMAGE">NO IMAGE</div>
       </div>
       <div class="modal-body">
@@ -18,44 +18,80 @@
         <p v-if="item.completedAt" class="modal-completed">
           達成日: {{ formatDate(item.completedAt) }}
         </p>
-        <a
-          v-if="item.link"
-          :href="item.link"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="modal-link"
-        >
-          詳細を見る
-        </a>
+        <div v-if="item.nextAction" class="modal-manage">
+          <h3>次の一歩</h3>
+          <p>{{ item.nextAction }}</p>
+        </div>
+        <div v-if="item.progress" class="modal-manage">
+          <h3>進捗メモ</h3>
+          <p>{{ item.progress }}</p>
+        </div>
+        <div class="modal-nav">
+          <button type="button" class="nav-button prev" :disabled="!hasPrev" @click="$emit('prev')">
+            ← 前の項目
+          </button>
+          <button type="button" class="nav-button edit-button" @click="$emit('edit')">
+            編集する
+          </button>
+          <button type="button" class="nav-button next" :disabled="!hasNext" @click="$emit('next')">
+            次の項目 →
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import { onMounted, onUnmounted } from 'vue';
 import { formatDate, formatTargetAge } from '../utils/formatters';
-import { isDataImage } from '../utils/image';
+import { isDisplayableImage } from '../utils/image';
 
 defineProps({
   item: {
     type: Object,
     required: true
+  },
+  hasPrev: {
+    type: Boolean,
+    default: false
+  },
+  hasNext: {
+    type: Boolean,
+    default: false
   }
 });
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close', 'prev', 'next', 'edit']);
 
 const close = () => {
   emit('close');
 };
 
+const handleKeydown = (event) => {
+  if (event.key === 'Escape') {
+    close();
+  } else if (event.key === 'ArrowLeft') {
+    emit('prev');
+  } else if (event.key === 'ArrowRight') {
+    emit('next');
+  }
+};
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeydown);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown);
+});
 </script>
 
 <style scoped>
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.7);
+  background: rgba(23, 20, 15, 0.72);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -64,7 +100,8 @@ const close = () => {
 }
 
 .modal-card {
-  background: #fff;
+  background: var(--surface);
+  color: var(--ink);
   border-radius: 24px;
   max-width: 720px;
   width: min(90vw, 720px);
@@ -80,17 +117,18 @@ const close = () => {
   top: 12px;
   right: 12px;
   border: none;
-  background: #111827;
-  color: #fff;
+  background: var(--ink);
+  color: var(--bg);
   width: 32px;
   height: 32px;
   border-radius: 50%;
   font-size: 1.25rem;
   cursor: pointer;
+  z-index: 1;
 }
 
 .modal-media {
-  background: #f3f4f6;
+  background: var(--accent-soft);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -109,8 +147,8 @@ const close = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e5e7eb;
-  color: #6b7280;
+  background: var(--line);
+  color: var(--ink-3);
   font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -124,6 +162,10 @@ const close = () => {
   gap: 12px;
 }
 
+.modal-body h2 {
+  font-family: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
+}
+
 .modal-meta {
   display: flex;
   flex-wrap: wrap;
@@ -131,8 +173,8 @@ const close = () => {
 }
 
 .modal-meta .chip {
-  background: #e5e7eb;
-  color: #374151;
+  background: var(--accent-soft);
+  color: var(--ink-2);
   border-radius: 999px;
   padding: 4px 10px;
   font-size: 0.8rem;
@@ -141,13 +183,46 @@ const close = () => {
 
 .modal-completed {
   margin: 0;
-  color: #6b7280;
+  color: var(--ink-2);
   font-size: 0.9rem;
 }
 
-.modal-link {
-  color: #2563eb;
+.modal-manage h3 {
+  margin: 0 0 4px;
+  font-size: 0.85rem;
+  color: var(--accent);
+  letter-spacing: 0.06em;
+}
+
+.modal-manage p {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.edit-button {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.modal-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.nav-button {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 16px;
+  background: var(--surface);
+  color: var(--ink);
   font-weight: 600;
-  text-decoration: none;
+  cursor: pointer;
+}
+
+.nav-button:disabled {
+  opacity: 0.4;
+  cursor: default;
 }
 </style>

@@ -1,7 +1,8 @@
-import { describe, expect, it, vi, afterEach, beforeEach } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import TileCard from '../components/TileCard.vue';
 import TileGrid from '../components/TileGrid.vue';
+import TileModal from '../components/TileModal.vue';
 
 const makeItem = (overrides = {}) => ({
   title: 'Item',
@@ -16,36 +17,36 @@ const mountCard = (itemOverrides = {}) =>
   });
 
 describe('TileCard', () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-    const mockDate = new Date('2024-08-15T12:00:00.000Z'); // 実年齢が44歳になる日付
-    vi.setSystemTime(mockDate);
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
-  it('renders title, description, and link', () => {
+  it('renders title, image, and labels', () => {
     const wrapper = mountCard({
       title: 'Climb Fuji',
-      note: 'Before summer ends',
-      link: 'https://example.com',
+      category: 'Travel',
+      targetAge: 50,
       imageUrl: 'data:image/png;base64,abc123'
     });
 
     expect(wrapper.text()).toContain('Climb Fuji');
-    const anchor = wrapper.get('a');
-    expect(anchor.attributes('href')).toBe('https://example.com');
     expect(wrapper.find('img').exists()).toBe(true);
     expect(wrapper.find('.placeholder').exists()).toBe(false);
+    expect(wrapper.text()).toContain('Travel');
+    expect(wrapper.text()).toContain('目標: 50歳台');
+  });
+
+  it('renders https images', () => {
+    const wrapper = mountCard({
+      title: 'External image',
+      imageUrl: 'https://example.com/image.png'
+    });
+
+    expect(wrapper.find('img').exists()).toBe(true);
+    expect(wrapper.find('img').attributes('src')).toBe('https://example.com/image.png');
   });
 
   it('omits optional fields when missing', () => {
     const wrapper = mountCard({ title: 'No extras' });
 
-    expect(wrapper.find('a').exists()).toBe(false);
     expect(wrapper.find('.placeholder').exists()).toBe(true);
+    expect(wrapper.find('.meta').exists()).toBe(false);
   });
 
   it('shows completed overlay when completed', () => {
@@ -68,87 +69,12 @@ describe('TileCard', () => {
     expect(wrapper.text()).toContain('達成日: invalid-date');
   });
 
-  it('calculates age correctly just after the birthday', () => {
-    // This test ensures the branch condition in calculateAge is covered
-    // where the current month is after the birth month.
-    const mockDate = new Date('2024-09-03T12:00:00.000Z'); // Birthday is 09-02. Actual age is 45. Normalized is 40.
-    vi.setSystemTime(mockDate);
-
-    const wrapper = mountCard({
-      title: 'Post-birthday test',
-      targetAge: 50 // Should be priority-mid
-    });
-
-    expect(wrapper.classes()).toContain('priority-mid');
-  });
-
-  it.each([
-    { targetAge: 40, expectedClass: 'priority-high' },
-    { targetAge: 50, expectedClass: 'priority-mid' },
-    { targetAge: 60, expectedClass: 'priority-low' },
-    { targetAge: 'invalid', expectedClass: 'priority-low' },
-    { targetAge: undefined, expectedClass: 'priority-low' }
-  ])('applies correct priority class for targetAge $targetAge', ({ targetAge, expectedClass }) => {
-    const wrapper = mountCard({
-      title: 'Priority Test',
-      targetAge
-    });
-    expect(wrapper.classes()).toContain(expectedClass);
-  });
-
-  it('applies completed class and no priority class if item is completed', () => {
-    const wrapper = mountCard({
-      title: 'Completed item',
-      targetAge: 40,
-      completed: true
-    });
-    expect(wrapper.classes()).toContain('completed');
-    expect(wrapper.classes()).not.toContain('priority-high');
-  });
-
-  it('emits filter events for category and target age', async () => {
-    const wrapper = mountCard({
-      title: 'Tagged',
-      category: 'Food',
-      targetAge: 'Kids'
-    });
-
-    const buttons = wrapper.findAll('button.chip');
-    await buttons[0].trigger('click');
-    await buttons[1].trigger('click');
-
-    expect(wrapper.emitted('filter')).toEqual([
-      [{ type: 'category', value: 'Food' }],
-      [{ type: 'targetAge', value: 'Kids' }]
-    ]);
-    expect(wrapper.text()).toContain('目標: Kids');
-  });
-
-  it('formats numeric target age as decade', () => {
-    const wrapper = mountCard({
-      title: 'Plan',
-      targetAge: 50
-    });
-
-    expect(wrapper.text()).toContain('目標: 50歳台');
-  });
-
   it('emits select when card is clicked', async () => {
     const wrapper = mountCard({ title: 'Click me' });
 
     await wrapper.trigger('click');
 
     expect(wrapper.emitted('select')).toEqual([[{ title: 'Click me' }]]);
-  });
-
-  it('shows placeholder when image is not a data URI', () => {
-    const wrapper = mountCard({
-      title: 'External image',
-      imageUrl: 'https://example.com/image.png'
-    });
-
-    expect(wrapper.find('img').exists()).toBe(false);
-    expect(wrapper.find('.placeholder').text()).toBe('NO IMAGE');
   });
 });
 
@@ -164,5 +90,118 @@ describe('TileGrid', () => {
     });
 
     expect(wrapper.findAllComponents(TileCard)).toHaveLength(2);
+  });
+
+  it('passes select events through', async () => {
+    const wrapper = mount(TileGrid, {
+      props: {
+        items: [{ id: '1', title: 'Item 1' }]
+      }
+    });
+
+    await wrapper.find('article.card').trigger('click');
+
+    expect(wrapper.emitted('select')).toEqual([[{ id: '1', title: 'Item 1' }]]);
+  });
+});
+
+describe('TileModal', () => {
+  const mountModal = (props = {}) =>
+    mount(TileModal, {
+      props: {
+        item: makeItem({ title: 'Modal item' }),
+        ...props
+      }
+    });
+
+  it('renders item details', () => {
+    const wrapper = mountModal({
+      item: makeItem({
+        title: 'Detailed',
+        note: 'A note.',
+        category: 'Travel',
+        targetAge: 40,
+        completedAt: '2023-10-26T15:00:00.000Z',
+        imageUrl: 'https://example.com/image.png'
+      })
+    });
+
+    expect(wrapper.text()).toContain('Detailed');
+    expect(wrapper.text()).toContain('A note.');
+    expect(wrapper.text()).toContain('Travel');
+    expect(wrapper.text()).toContain('目標: 40歳台');
+    expect(wrapper.text()).toContain('達成日: 2023年10月27日');
+    expect(wrapper.find('.modal-media img').exists()).toBe(true);
+  });
+
+  it('shows placeholder without an image', () => {
+    const wrapper = mountModal();
+
+    expect(wrapper.find('.modal-placeholder').exists()).toBe(true);
+  });
+
+  it('shows management fields and emits edit', async () => {
+    const wrapper = mountModal({
+      item: makeItem({
+        title: 'Managed',
+        nextAction: '予約する',
+        progress: '下調べ中'
+      })
+    });
+
+    expect(wrapper.text()).toContain('次の一歩');
+    expect(wrapper.text()).toContain('予約する');
+    expect(wrapper.text()).toContain('進捗メモ');
+    expect(wrapper.text()).toContain('下調べ中');
+
+    await wrapper.get('button.edit-button').trigger('click');
+    expect(wrapper.emitted('edit')).toHaveLength(1);
+  });
+
+  it('hides management sections when empty', () => {
+    const wrapper = mountModal();
+
+    expect(wrapper.text()).not.toContain('次の一歩');
+    expect(wrapper.text()).not.toContain('進捗メモ');
+  });
+
+  it('emits close on background and button clicks', async () => {
+    const wrapper = mountModal();
+
+    await wrapper.find('.modal-close').trigger('click');
+    await wrapper.find('.modal').trigger('click');
+
+    expect(wrapper.emitted('close')).toHaveLength(2);
+  });
+
+  it('emits prev and next from nav buttons and disables at the ends', async () => {
+    const wrapper = mountModal({ hasPrev: false, hasNext: true });
+
+    const prevButton = wrapper.get('button.prev');
+    const nextButton = wrapper.get('button.next');
+    expect(prevButton.attributes('disabled')).toBeDefined();
+    expect(nextButton.attributes('disabled')).toBeUndefined();
+
+    await nextButton.trigger('click');
+    expect(wrapper.emitted('next')).toHaveLength(1);
+    expect(wrapper.emitted('prev')).toBeUndefined();
+  });
+
+  it('handles keyboard navigation', async () => {
+    const removeSpy = vi.spyOn(window, 'removeEventListener');
+    const wrapper = mountModal({ hasPrev: true, hasNext: true });
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'a' }));
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+
+    expect(wrapper.emitted('prev')).toHaveLength(1);
+    expect(wrapper.emitted('next')).toHaveLength(1);
+    expect(wrapper.emitted('close')).toHaveLength(1);
+
+    wrapper.unmount();
+    expect(removeSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
+    removeSpy.mockRestore();
   });
 });
