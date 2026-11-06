@@ -83,10 +83,13 @@
       :item="selectedTile"
       :has-prev="hasPrev"
       :has-next="hasNext"
+      :deleting="modalDeleting"
+      :delete-error="modalDeleteError"
       @close="closeTile"
       @prev="prevTile"
       @next="nextTile"
       @edit="openEdit"
+      @delete="deleteFromModal"
     />
 
     <ItemEditor
@@ -239,6 +242,26 @@ const deleteEditor = async (id) => {
     editorError.value = err instanceof Error ? err.message : '削除に失敗しました。';
   } finally {
     editorSaving.value = false;
+  }
+};
+
+const modalDeleting = ref(false);
+const modalDeleteError = ref('');
+
+watch(selectedTile, () => {
+  modalDeleteError.value = '';
+});
+
+const deleteFromModal = async () => {
+  modalDeleting.value = true;
+  modalDeleteError.value = '';
+  try {
+    await deleteItem(selectedTile.value.id);
+    closeTile();
+  } catch (err) {
+    modalDeleteError.value = err instanceof Error ? err.message : '削除に失敗しました。';
+  } finally {
+    modalDeleting.value = false;
   }
 };
 </script>

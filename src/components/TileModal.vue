@@ -37,6 +37,12 @@
             次の項目 →
           </button>
         </div>
+        <p v-if="deleteError" class="modal-error">{{ deleteError }}</p>
+        <div class="modal-actions">
+          <button type="button" class="delete-btn" :disabled="deleting" @click="remove">
+            削除
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -47,7 +53,7 @@ import { onMounted, onUnmounted } from 'vue';
 import { formatDate, formatTargetAge } from '../utils/formatters';
 import { isDisplayableImage } from '../utils/image';
 
-defineProps({
+const props = defineProps({
   item: {
     type: Object,
     required: true
@@ -59,13 +65,27 @@ defineProps({
   hasNext: {
     type: Boolean,
     default: false
+  },
+  deleting: {
+    type: Boolean,
+    default: false
+  },
+  deleteError: {
+    type: String,
+    default: ''
   }
 });
 
-const emit = defineEmits(['close', 'prev', 'next', 'edit']);
+const emit = defineEmits(['close', 'prev', 'next', 'edit', 'delete']);
 
 const close = () => {
   emit('close');
+};
+
+const remove = () => {
+  if (window.confirm('この項目を削除しますか？')) {
+    emit('delete', props.item.id);
+  }
 };
 
 const handleKeydown = (event) => {
@@ -234,5 +254,32 @@ onUnmounted(() => {
 .nav-button:disabled {
   opacity: 0.4;
   cursor: default;
+}
+
+.modal-error {
+  margin: 0;
+  color: var(--error);
+  font-size: 0.9rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.delete-btn {
+  border: 1px solid var(--error);
+  color: var(--error);
+  background: none;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.delete-btn:disabled {
+  opacity: 0.5;
+  cursor: wait;
 }
 </style>
