@@ -128,38 +128,44 @@ const emitChange = (partial) => {
 .filter-label {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--ink-2);
+  color: var(--muted);
   min-width: 4.5em;
 }
 
 .chip {
-  border: 1px solid var(--line);
+  border: 1px solid var(--border);
   border-radius: 999px;
   padding: 4px 12px;
-  background: var(--surface);
-  color: var(--ink-2);
+  background: var(--surface-elevated);
+  color: var(--muted);
+  font: inherit;
   font-size: 0.85rem;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.chip:hover {
+  border-color: var(--primary);
 }
 
 .chip .count {
-  color: var(--ink-3);
+  color: var(--muted);
   font-size: 0.78rem;
 }
 
 .chip.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
 }
 
 .chip.active .count {
-  color: #fff;
+  color: #ffffff;
 }
 
 .result {
   margin: 0;
-  color: var(--ink-2);
+  color: var(--muted);
   font-size: 0.9rem;
   display: flex;
   align-items: center;
@@ -169,11 +175,13 @@ const emitChange = (partial) => {
 .clear {
   border: none;
   background: none;
-  color: var(--accent);
+  color: var(--link);
+  font: inherit;
   font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
   padding: 0;
   text-decoration: underline;
+  text-underline-offset: 2px;
 }
 </style>

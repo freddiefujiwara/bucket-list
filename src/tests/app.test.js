@@ -67,6 +67,7 @@ describe('App', () => {
   afterEach(() => {
     localStorage.clear();
     window.history.replaceState(null, '', window.location.pathname);
+    document.documentElement.removeAttribute('data-theme');
     delete window.google;
     vi.restoreAllMocks();
   });
@@ -74,10 +75,69 @@ describe('App', () => {
   it('shows the login gate when unauthenticated', async () => {
     const wrapper = await mountApp();
 
-    expect(wrapper.find('.login-gate').exists()).toBe(true);
-    expect(wrapper.text()).toContain('本人の目標管理ページです');
+    expect(wrapper.find('.auth-gate').exists()).toBe(true);
+    expect(wrapper.text()).toContain('Googleログインが必要です');
+    expect(wrapper.text()).toContain('許可されたアカウントでサインインしてください。');
     expect(fetchItems).not.toHaveBeenCalled();
     expect(wrapper.text()).not.toContain('コピー完了');
+  });
+
+  it('renders the admin header without the public site chrome', async () => {
+    const wrapper = await mountApp();
+
+    expect(wrapper.get('.header h1').text()).toBe('バケットリスト');
+    expect(wrapper.find('.site-nav').exists()).toBe(false);
+    expect(wrapper.find('.hero').exists()).toBe(false);
+    expect(wrapper.find('.site-footer').exists()).toBe(false);
+    // Signed out: the theme toggle is visible, the logout button is not.
+    expect(wrapper.find('.logout-btn').exists()).toBe(false);
+  });
+
+  describe('theme', () => {
+    const themeButton = (wrapper) => wrapper.get('.header-buttons .theme-toggle');
+
+    it('defaults to dark and toggles to light, persisting the choice', async () => {
+      const wrapper = await mountApp();
+
+      expect(themeButton(wrapper).text()).toBe('ライト');
+      expect(document.documentElement.getAttribute('data-theme')).toBe(null);
+
+      await themeButton(wrapper).trigger('click');
+
+      expect(themeButton(wrapper).text()).toBe('ダーク');
+      expect(localStorage.getItem('bucket-list-theme')).toBe('light');
+      expect(document.documentElement.getAttribute('data-theme')).toBe('light');
+
+      await themeButton(wrapper).trigger('click');
+
+      expect(themeButton(wrapper).text()).toBe('ライト');
+      expect(localStorage.getItem('bucket-list-theme')).toBe('dark');
+      expect(document.documentElement.getAttribute('data-theme')).toBe(null);
+    });
+
+    it('restores the stored light theme on mount', async () => {
+      localStorage.setItem('bucket-list-theme', 'light');
+
+      const wrapper = await mountApp();
+
+      expect(themeButton(wrapper).text()).toBe('ダーク');
+      expect(document.documentElement.getAttribute('data-theme')).toBe('light');
+    });
+  });
+
+  it('shows the share-expired notice when a share session is rejected', async () => {
+    loginWithShare();
+    fetchItems.mockRejectedValue(new ApiError('share session expired or invalid', 401));
+
+    const wrapper = await mountApp();
+
+    expect(wrapper.find('.share-expired').exists()).toBe(true);
+    expect(wrapper.text()).toContain('リンクの有効期限が切れています');
+    expect(wrapper.text()).toContain(
+      'この一時アクセスリンクは無効か、期限切れです。発行者に新しいリンクを依頼してください。'
+    );
+    expect(wrapper.text()).not.toContain('Googleログインが必要です');
+    expect(localStorage.getItem('bucket-list:share-token')).toBe(null);
   });
 
   it('shows a notice when the Google script fails to load', async () => {
@@ -122,7 +182,7 @@ describe('App', () => {
 
     const wrapper = await mountApp();
 
-    expect(wrapper.find('.login-gate').exists()).toBe(true);
+    expect(wrapper.find('.auth-gate').exists()).toBe(true);
     expect(wrapper.text()).toContain('ログインの有効期限が切れました');
     expect(localStorage.getItem('bucket-list:id-token')).toBe(null);
   });
@@ -169,7 +229,7 @@ describe('App', () => {
     await wrapper.get('.logout-btn').trigger('click');
     await flushPromises();
 
-    expect(wrapper.find('.login-gate').exists()).toBe(true);
+    expect(wrapper.find('.auth-gate').exists()).toBe(true);
     expect(localStorage.getItem('bucket-list:id-token')).toBe(null);
   });
 
@@ -416,7 +476,7 @@ describe('App', () => {
       await wrapper.get('.editor form').trigger('submit');
       await flushPromises();
 
-      expect(wrapper.find('.login-gate').exists()).toBe(true);
+      expect(wrapper.find('.auth-gate').exists()).toBe(true);
       expect(localStorage.getItem('bucket-list:id-token')).toBe(null);
     });
 

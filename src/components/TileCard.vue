@@ -38,8 +38,8 @@ const handleSelect = () => {
 <style scoped>
 .card {
   background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 18px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -51,7 +51,7 @@ const handleSelect = () => {
 
 .card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 16px 36px rgba(34, 29, 22, 0.16);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
 }
 
 .media {
@@ -59,7 +59,7 @@ const handleSelect = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--accent-soft);
+  background: var(--surface-elevated);
   position: relative;
 }
 
@@ -76,8 +76,8 @@ const handleSelect = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--accent-soft);
-  color: var(--ink-3);
+  background: var(--surface-elevated);
+  color: var(--muted);
   font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -86,8 +86,8 @@ const handleSelect = () => {
 .info {
   position: absolute;
   inset: auto 0 0 0;
-  background: rgba(34, 29, 22, 0.68);
-  color: #fdfbf7;
+  background: rgba(2, 6, 23, 0.78);
+  color: #ffffff;
   padding: 14px 18px 16px;
   display: flex;
   flex-direction: column;
@@ -109,8 +109,9 @@ h2 {
 .chip {
   border-radius: 999px;
   padding: 4px 10px;
-  background: rgba(251, 250, 247, 0.88);
-  color: #221d16;
+  background: var(--surface-elevated);
+  color: var(--text);
+  border: 1px solid var(--border);
   font-size: 0.75rem;
   font-weight: 600;
 }
@@ -122,8 +123,8 @@ h2 {
 .overlay {
   position: absolute;
   inset: 12px 12px auto 12px;
-  background: rgba(34, 29, 22, 0.72);
-  color: #fff;
+  background: var(--primary);
+  color: #ffffff;
   padding: 8px 12px;
   border-radius: 12px;
   font-size: 0.85rem;

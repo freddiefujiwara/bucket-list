@@ -30,6 +30,6 @@ const handleSelect = (payload) => {
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
+  gap: 16px;
 }
 </style>
