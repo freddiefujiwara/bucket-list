@@ -18,7 +18,8 @@ export default defineConfig(({ mode }) => {
         lines: 100,
         exclude: [
           'src/main.js',
-          '*.js'
+          '*.js',
+          'e2e/**'
         ]
       }
     }

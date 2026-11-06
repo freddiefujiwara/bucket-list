@@ -6,64 +6,40 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x]
-
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run tests
-        run: npm test
-
-      - name: Build
-        run: npm run build
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    strategy:
-      matrix:
-        node-version: [20.x]
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build
-        run: npm run build
-
-      - name: Generate OGP Image from GAS JSON
-        run: |
-          # URL-encoded title: Bucket List Tiles -> Bucket%20List%20Tiles
-          JSON_RESPONSE=$(curl -L -s "https://script.google.com/macros/s/AKfycbzbMAKxkzHlwN8SY7ygJA34xYESMNNdkGNt8vv1XMcZSksgHsUwOxCCdP-wgg6fv7M/exec?t=Bucket%20List%20Tiles")
-          echo $JSON_RESPONSE | jq -r '.png' | base64 -d > ./dist/ogp.png
-          ls -lh ./dist/ogp.png
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+    - uses: actions/checkout@v4
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    - run: npm install
+    - run: npm test
+    - run: npm run build
+    - name: Build staging variant into dist/staging
+      env:
+        VITE_BASE: "/bucket-list/staging/"
+        VITE_STAGING: "1"
+        VITE_DATA_URL: "https://script.google.com/macros/s/AKfycbylntjD8K8_9bIHFy2edMYYXoufciAFL5uxKcGiHuqKujif8nGoWu7HKoXG7t2p-Lcg/exec"
+      run: |
+        npm run build:staging
+        mkdir -p dist/staging
+        cp -r dist-staging/* dist/staging/
+    - name: Generate OGP Image from GAS JSON
+      run: |
+        # URL-encoded title: バケットリスト
+        JSON_RESPONSE=$(curl -L -s "https://script.google.com/macros/s/AKfycbzbMAKxkzHlwN8SY7ygJA34xYESMNNdkGNt8vv1XMcZSksgHsUwOxCCdP-wgg6fv7M/exec?t=%E3%83%90%E3%82%B1%E3%83%83%E3%83%88%E3%83%AA%E3%82%B9%E3%83%88")
+        echo $JSON_RESPONSE | jq -r '.png' | base64 -d > ./dist/ogp.png
+        ls -lh ./dist/ogp.png
+    - name: Deploy to GitHub Pages
+      if: github.event_name == 'push'
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./dist
