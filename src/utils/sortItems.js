@@ -12,6 +12,17 @@ const parseAge = (value) => {
 };
 
 /**
+ * Parses an id into a number for stable ordering. Returns Infinity for
+ * non-numeric ids so they keep their relative order at the end.
+ * @param {string | number} value The id to parse.
+ * @returns {number} The parsed number or Infinity.
+ */
+const parseId = (value) => {
+  const num = parseInt(value, 10);
+  return Number.isNaN(num) ? Infinity : num;
+};
+
+/**
  * Parses a date string into a Date object. Returns null for invalid dates.
  * @param {string | number | Date} value The date value to parse.
  * @returns {Date | null} The parsed Date object or null.
@@ -24,56 +35,39 @@ const parseDate = (value) => {
   return Number.isNaN(date.getTime()) ? null : date;
 };
 
-/**
- * Shuffles an array in place using the Fisher-Yates algorithm.
- * @param {Array<T>} array The array to shuffle.
- * @returns {Array<T>} The shuffled array.
- */
-const shuffle = (array) => {
-  for (let i = array.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
+const compareById = (a, b) => {
+  const diff = parseId(a.id) - parseId(b.id);
+  return Number.isNaN(diff) ? 0 : diff;
 };
 
+/**
+ * Orders items deterministically: uncompleted items first (target age
+ * ascending, then id ascending), completed items last (completion date
+ * ascending, then id ascending). Invalid ages and dates go to the end of
+ * their group. The order never changes between loads.
+ */
 export const sortItems = (items) => {
-  const itemsCopy = [...items];
+  const uncompletedItems = items.filter((item) => item.completed !== true);
+  const completedItems = items.filter((item) => item.completed === true);
 
-  const uncompletedItems = itemsCopy.filter((item) => item.completed !== true);
-  const completedItems = itemsCopy.filter((item) => item.completed === true);
+  uncompletedItems.sort((a, b) => {
+    const ageDiff = parseAge(a.targetAge) - parseAge(b.targetAge);
+    if (ageDiff !== 0 && !Number.isNaN(ageDiff)) {
+      return ageDiff;
+    }
+    return compareById(a, b);
+  });
 
-  // Sort completed items by completed_at ascending
-  // null, undefined, or invalid dates go to the end
   completedItems.sort((a, b) => {
     const dateA = parseDate(a.completedAt);
     const dateB = parseDate(b.completedAt);
 
-    if (dateA === null && dateB === null) return 0;
+    if (dateA === null && dateB === null) return compareById(a, b);
     if (dateA === null) return 1;
     if (dateB === null) return -1;
-    return dateA.getTime() - dateB.getTime();
+    const dateDiff = dateA.getTime() - dateB.getTime();
+    return dateDiff !== 0 ? dateDiff : compareById(a, b);
   });
 
-  // Group uncompleted items by target_age
-  const uncompletedGroups = uncompletedItems.reduce((groups, item) => {
-    const age = parseAge(item.targetAge);
-    const key = age.toString(); // Use string key for object
-    if (!groups[key]) {
-      groups[key] = [];
-    }
-    groups[key].push(item);
-    return groups;
-  }, {});
-
-  // Get sorted age groups
-  const sortedAges = Object.keys(uncompletedGroups).sort((a, b) => parseFloat(a) - parseFloat(b));
-
-  // Shuffle within each group and flatten
-  const sortedUncompletedItems = sortedAges.flatMap((age) => {
-    const group = uncompletedGroups[age];
-    return shuffle(group);
-  });
-
-  return [...sortedUncompletedItems, ...completedItems];
+  return [...uncompletedItems, ...completedItems];
 };

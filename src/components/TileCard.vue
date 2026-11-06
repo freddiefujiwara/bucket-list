@@ -1,37 +1,14 @@
 <template>
-  <article class="card" :class="cardClasses" @click="handleSelect">
+  <article class="card" :class="{ completed: item.completed }" @click="handleSelect">
     <div class="media">
-      <img v-if="isDataImage(item.imageUrl)" :src="item.imageUrl" :alt="item.title" loading="lazy" />
+      <img v-if="isDisplayableImage(item.imageUrl)" :src="item.imageUrl" :alt="item.title" loading="lazy" />
       <div v-else class="placeholder" aria-label="NO IMAGE">NO IMAGE</div>
       <div class="info">
         <h2>{{ item.title }}</h2>
         <div class="meta" v-if="item.category || item.targetAge">
-          <button
-            v-if="item.category"
-            class="chip"
-            type="button"
-            @click.stop="handleCategoryFilter"
-          >
-            {{ item.category }}
-          </button>
-          <button
-            v-if="item.targetAge"
-            class="chip"
-            type="button"
-            @click.stop="handleTargetAgeFilter"
-          >
-            {{ formatTargetAge(item.targetAge) }}
-          </button>
+          <span v-if="item.category" class="chip">{{ item.category }}</span>
+          <span v-if="item.targetAge" class="chip">{{ formatTargetAge(item.targetAge) }}</span>
         </div>
-        <a
-          v-if="item.link"
-          :href="item.link"
-          target="_blank"
-          rel="noopener noreferrer"
-          @click.stop
-        >
-          詳細を見る
-        </a>
       </div>
     </div>
     <div v-if="item.completed && item.completedAt" class="overlay">
@@ -41,10 +18,8 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { getCardClasses } from '../utils/cardPriority';
 import { formatDate, formatTargetAge } from '../utils/formatters';
-import { isDataImage } from '../utils/image';
+import { isDisplayableImage } from '../utils/image';
 
 const props = defineProps({
   item: {
@@ -53,39 +28,30 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['filter', 'select']);
-
-const cardClasses = computed(() => getCardClasses(props.item));
+const emit = defineEmits(['select']);
 
 const handleSelect = () => {
   emit('select', props.item);
-};
-
-const handleCategoryFilter = () => {
-  emit('filter', { type: 'category', value: props.item.category });
-};
-
-const handleTargetAgeFilter = () => {
-  emit('filter', { type: 'targetAge', value: props.item.targetAge });
 };
 </script>
 
 <style scoped>
 .card {
-  background: #fff;
+  background: var(--surface);
+  border: 1px solid var(--line);
   border-radius: 18px;
   overflow: hidden;
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
   display: flex;
   flex-direction: column;
   min-height: 260px;
   position: relative;
-  transition: box-shadow 0.2s ease, filter 0.2s ease, transform 0.2s ease;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.16);
+  box-shadow: 0 16px 36px rgba(34, 29, 22, 0.16);
 }
 
 .media {
@@ -93,7 +59,7 @@ const handleTargetAgeFilter = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f3f4f6;
+  background: var(--accent-soft);
   position: relative;
 }
 
@@ -110,8 +76,8 @@ const handleTargetAgeFilter = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e5e7eb;
-  color: #6b7280;
+  background: var(--accent-soft);
+  color: var(--ink-3);
   font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -120,8 +86,8 @@ const handleTargetAgeFilter = () => {
 .info {
   position: absolute;
   inset: auto 0 0 0;
-  background: rgba(31, 41, 55, 0.65);
-  color: #f9fafb;
+  background: rgba(34, 29, 22, 0.68);
+  color: #fdfbf7;
   padding: 14px 18px 16px;
   display: flex;
   flex-direction: column;
@@ -134,13 +100,6 @@ h2 {
   color: inherit;
 }
 
-p {
-  margin: 0;
-  color: #4b5563;
-  font-size: 0.95rem;
-  flex: 1;
-}
-
 .meta {
   display: flex;
   flex-wrap: wrap;
@@ -148,20 +107,12 @@ p {
 }
 
 .chip {
-  border: none;
   border-radius: 999px;
   padding: 4px 10px;
-  background: rgba(229, 231, 235, 0.85);
-  color: #111827;
+  background: rgba(251, 250, 247, 0.88);
+  color: #221d16;
   font-size: 0.75rem;
   font-weight: 600;
-  cursor: pointer;
-}
-
-a {
-  color: #f9fafb;
-  font-weight: 600;
-  text-decoration: none;
 }
 
 .card.completed {
@@ -171,38 +122,12 @@ a {
 .overlay {
   position: absolute;
   inset: 12px 12px auto 12px;
-  background: rgba(31, 41, 55, 0.7);
+  background: rgba(34, 29, 22, 0.72);
   color: #fff;
   padding: 8px 12px;
   border-radius: 12px;
   font-size: 0.85rem;
   text-align: center;
   pointer-events: none;
-}
-
-@keyframes pulse-danger {
-  0% {
-    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08), 0 0 0 0 rgba(239, 68, 68, 0.7);
-  }
-  70% {
-    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08), 0 0 0 12px rgba(239, 68, 68, 0);
-  }
-  100% {
-    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08), 0 0 0 0 rgba(239, 68, 68, 0);
-  }
-}
-
-.card.priority-high {
-  border: 2px solid #ef4444; /* red-500 */
-  animation: pulse-danger 2s infinite;
-}
-
-.card.priority-mid {
-  border: 2px solid #f97316; /* orange-500 */
-  box-shadow: 0 8px 20px rgba(249, 115, 22, 0.2);
-}
-
-.card.priority-low {
-  border: 2px solid #3b82f6; /* blue-500 */
 }
 </style>

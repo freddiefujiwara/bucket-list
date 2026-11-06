@@ -10,6 +10,8 @@ export const normalizeItems = (payload) => {
     title: item.title ?? '',
     note: item.note ?? '',
     imageUrl: item.image_url ?? '',
+    nextAction: item.next_action ?? '',
+    progress: item.progress ?? '',
     completed: item.completed ?? false,
     completedAt: item.completed_at ?? null
   }));

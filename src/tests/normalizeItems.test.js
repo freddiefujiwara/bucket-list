@@ -11,6 +11,8 @@ describe('normalizeItems', () => {
         title: 'Tokyo',
         note: 'Visit',
         image_url: 'img.jpg',
+        next_action: 'Book the flight',
+        progress: 'Saving money',
         completed: true,
         completed_at: '2024-01-01'
       }
@@ -24,6 +26,8 @@ describe('normalizeItems', () => {
         title: 'Tokyo',
         note: 'Visit',
         imageUrl: 'img.jpg',
+        nextAction: 'Book the flight',
+        progress: 'Saving money',
         completed: true,
         completedAt: '2024-01-01'
       }
@@ -44,6 +48,8 @@ describe('normalizeItems', () => {
     expect(result[0].imageUrl).toBe('');
     expect(result[0].completed).toBe(false);
     expect(result[0].completedAt).toBe(null);
+    expect(result[0].nextAction).toBe('');
+    expect(result[0].progress).toBe('');
     expect(result[0].category).toBe('');
     expect(result[0].targetAge).toBe(null);
   });
@@ -70,6 +76,8 @@ describe('normalizeItems', () => {
         title: 'Tokyo',
         note: 'Visit',
         imageUrl: 'img.jpg',
+        nextAction: '',
+        progress: '',
         completed: false,
         completedAt: null
       }
