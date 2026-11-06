@@ -420,6 +420,77 @@ describe('App', () => {
       expect(wrapper.find('.editor').exists()).toBe(false);
     });
 
+    it('deletes an item from the detail modal', async () => {
+      vi.spyOn(window, 'confirm').mockReturnValue(true);
+      const wrapper = await mountWithSamples();
+
+      await wrapper.findAll('article.card')[0].trigger('click');
+      await wrapper.get('.modal .delete-btn').trigger('click');
+      await flushPromises();
+
+      expect(postAction).toHaveBeenCalledWith(
+        { idToken: 'owner-token', shareToken: '' },
+        'delete_item',
+        { id: 1 }
+      );
+      expect(wrapper.find('.modal').exists()).toBe(false);
+    });
+
+    it('does not delete from the detail modal when confirmation is dismissed', async () => {
+      vi.spyOn(window, 'confirm').mockReturnValue(false);
+      const wrapper = await mountWithSamples();
+
+      await wrapper.findAll('article.card')[0].trigger('click');
+      await wrapper.get('.modal .delete-btn').trigger('click');
+      await flushPromises();
+
+      expect(postAction).not.toHaveBeenCalled();
+      expect(wrapper.find('.modal').exists()).toBe(true);
+    });
+
+    it('keeps the modal open and shows the error when deleting from the modal fails', async () => {
+      postAction.mockRejectedValue(new Error('削除エラー'));
+      vi.spyOn(window, 'confirm').mockReturnValue(true);
+      const wrapper = await mountWithSamples();
+
+      await wrapper.findAll('article.card')[0].trigger('click');
+      await wrapper.get('.modal .delete-btn').trigger('click');
+      await flushPromises();
+
+      expect(wrapper.find('.modal').exists()).toBe(true);
+      expect(wrapper.find('.modal-error').text()).toBe('削除エラー');
+    });
+
+    it('uses the fallback message for a non-Error modal delete failure', async () => {
+      postAction.mockRejectedValue('boom');
+      vi.spyOn(window, 'confirm').mockReturnValue(true);
+      const wrapper = await mountWithSamples();
+
+      await wrapper.findAll('article.card')[0].trigger('click');
+      await wrapper.get('.modal .delete-btn').trigger('click');
+      await flushPromises();
+
+      expect(wrapper.find('.modal').exists()).toBe(true);
+      expect(wrapper.find('.modal-error').text()).toBe('削除に失敗しました。');
+    });
+
+    it('clears the modal delete error when navigating to another tile', async () => {
+      postAction.mockRejectedValue(new Error('削除エラー'));
+      vi.spyOn(window, 'confirm').mockReturnValue(true);
+      const wrapper = await mountWithSamples();
+
+      await wrapper.findAll('article.card')[0].trigger('click');
+      await wrapper.get('.modal .delete-btn').trigger('click');
+      await flushPromises();
+      expect(wrapper.find('.modal-error').text()).toBe('削除エラー');
+
+      await wrapper.get('button.next').trigger('click');
+      await flushPromises();
+
+      expect(wrapper.find('.modal h2').text()).toBe('Bravo');
+      expect(wrapper.find('.modal-error').exists()).toBe(false);
+    });
+
     it('keeps the editor open and shows the error when saving fails', async () => {
       postAction.mockRejectedValue(new Error('保存エラー'));
       const wrapper = await mountWithSamples();

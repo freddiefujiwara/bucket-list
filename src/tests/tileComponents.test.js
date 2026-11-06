@@ -187,6 +187,42 @@ describe('TileModal', () => {
     expect(wrapper.emitted('prev')).toBeUndefined();
   });
 
+  it('renders the delete button enabled and without an error by default', () => {
+    const wrapper = mountModal();
+
+    const deleteButton = wrapper.get('button.delete-btn');
+    expect(deleteButton.text()).toBe('削除');
+    expect(deleteButton.attributes('disabled')).toBeUndefined();
+    expect(wrapper.find('.modal-error').exists()).toBe(false);
+  });
+
+  it('emits delete with the item id only after confirmation', async () => {
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false);
+    const wrapper = mountModal({
+      item: makeItem({ id: 7, title: 'Deletable' })
+    });
+
+    await wrapper.get('button.delete-btn').trigger('click');
+    expect(confirmSpy).toHaveBeenCalledWith('この項目を削除しますか？');
+    expect(wrapper.emitted('delete')).toBeUndefined();
+
+    confirmSpy.mockReturnValue(true);
+    await wrapper.get('button.delete-btn').trigger('click');
+    expect(wrapper.emitted('delete')).toEqual([[7]]);
+  });
+
+  it('disables the delete button while deleting', () => {
+    const wrapper = mountModal({ deleting: true });
+
+    expect(wrapper.get('button.delete-btn').attributes('disabled')).toBeDefined();
+  });
+
+  it('shows the delete error passed in', () => {
+    const wrapper = mountModal({ deleteError: '削除に失敗しました。' });
+
+    expect(wrapper.get('.modal-error').text()).toBe('削除に失敗しました。');
+  });
+
   it('handles keyboard navigation', async () => {
     const removeSpy = vi.spyOn(window, 'removeEventListener');
     const wrapper = mountModal({ hasPrev: true, hasNext: true });
