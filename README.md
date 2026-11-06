@@ -1,6 +1,6 @@
 # Bucket List Frontend
 
-[View the Live Demo](https://freddiefujiwara.com/bucket-list/)
+[View the Live Demo](https://freddiefujiwara.com/bucket-list-admin/)
 
 This is the frontend application for the Bucket List project. It's a dynamic, tile-based gallery that displays data from a Google Apps Script backend, allowing users to browse, filter, and view details of their bucket list items.
 
