@@ -1,6 +1,6 @@
 <template>
-  <section class="share-panel">
-    <h2>一時リンク（30日有効）</h2>
+  <section class="table-wrap share-panel">
+    <h2 class="section-title">一時リンク（30日有効）</h2>
     <p class="share-note">
       発行したリンクは本人の管理用として読み書きできます。発行すると前のリンクは無効になります。
     </p>
@@ -120,23 +120,13 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.share-panel {
-  margin-top: 40px;
-  padding: 20px 24px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-}
-
 .share-panel h2 {
-  margin: 0 0 8px;
   font-size: 1.05rem;
-  font-family: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
 }
 
 .share-note {
   margin: 0 0 14px;
-  color: var(--ink-2);
+  color: var(--muted);
   font-size: 0.9rem;
 }
 
@@ -151,25 +141,30 @@ onUnmounted(() => {
 .share-url {
   flex: 1;
   min-width: 240px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
   padding: 9px 12px;
   font: inherit;
   font-size: 0.85rem;
-  color: var(--ink);
-  background: var(--bg);
+  color: var(--text);
+  background: var(--surface);
+}
+
+.share-url:focus {
+  outline: none;
+  border-color: var(--primary);
 }
 
 .share-meta {
   flex-basis: 100%;
   margin: 0;
-  color: var(--ink-2);
+  color: var(--muted);
   font-size: 0.85rem;
 }
 
 .share-message {
   margin: 0 0 12px;
-  color: var(--accent);
+  color: var(--primary);
   font-size: 0.9rem;
   font-weight: 600;
 }
@@ -180,24 +175,32 @@ onUnmounted(() => {
 }
 
 .share-issue {
-  border: none;
-  background: var(--accent);
-  color: #fff;
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: #ffffff;
   border-radius: 999px;
   padding: 9px 20px;
+  font: inherit;
   font-weight: 600;
   cursor: pointer;
 }
 
 .share-copy,
 .share-revoke {
-  border: 1px solid var(--line);
-  background: var(--surface);
-  color: var(--ink);
+  border: 1px solid var(--border);
+  background: var(--surface-elevated);
+  color: var(--text);
   border-radius: 999px;
   padding: 9px 18px;
+  font: inherit;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.share-copy:hover,
+.share-revoke:hover {
+  border-color: var(--primary);
 }
 
 .share-issue:disabled,

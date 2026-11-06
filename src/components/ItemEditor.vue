@@ -173,7 +173,7 @@ const remove = () => {
 .editor {
   position: fixed;
   inset: 0;
-  background: rgba(23, 20, 15, 0.72);
+  background: rgba(2, 6, 23, 0.72);
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -184,8 +184,9 @@ const remove = () => {
 
 .editor-card {
   background: var(--surface);
-  color: var(--ink);
-  border-radius: 24px;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
   width: min(92vw, 560px);
   padding: 24px;
   display: flex;
@@ -195,7 +196,6 @@ const remove = () => {
 
 .editor-card h2 {
   margin: 0;
-  font-family: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
   font-size: 1.25rem;
 }
 
@@ -205,7 +205,7 @@ const remove = () => {
   gap: 6px;
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--ink-2);
+  color: var(--muted);
   flex: 1;
 }
 
@@ -213,13 +213,21 @@ const remove = () => {
 .field input[type="date"],
 .field select,
 .field textarea {
-  border: 1px solid var(--line);
-  border-radius: 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
   padding: 9px 12px;
   font: inherit;
   font-weight: 400;
-  color: var(--ink);
+  color: var(--text);
   background: var(--surface);
+}
+
+.field input[type="text"]:focus,
+.field input[type="date"]:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--primary);
 }
 
 .field-row {
@@ -257,26 +265,34 @@ const remove = () => {
   background: none;
   border-radius: 999px;
   padding: 9px 18px;
+  font: inherit;
   font-weight: 600;
   cursor: pointer;
 }
 
 .cancel-btn {
-  border: 1px solid var(--line);
-  background: var(--surface);
-  color: var(--ink);
+  border: 1px solid var(--border);
+  background: var(--surface-elevated);
+  color: var(--text);
   border-radius: 999px;
   padding: 9px 18px;
+  font: inherit;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancel-btn:hover {
+  border-color: var(--primary);
 }
 
 .save-btn {
-  border: none;
-  background: var(--accent);
-  color: #fff;
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: #ffffff;
   border-radius: 999px;
   padding: 9px 22px;
+  font: inherit;
   font-weight: 600;
   cursor: pointer;
 }

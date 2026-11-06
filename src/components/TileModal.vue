@@ -91,7 +91,7 @@ onUnmounted(() => {
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(23, 20, 15, 0.72);
+  background: rgba(2, 6, 23, 0.72);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -101,8 +101,9 @@ onUnmounted(() => {
 
 .modal-card {
   background: var(--surface);
-  color: var(--ink);
-  border-radius: 24px;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
   max-width: 720px;
   width: min(90vw, 720px);
   max-height: 90vh;
@@ -116,9 +117,9 @@ onUnmounted(() => {
   position: absolute;
   top: 12px;
   right: 12px;
-  border: none;
-  background: var(--ink);
-  color: var(--bg);
+  border: 1px solid var(--border);
+  background: var(--surface-elevated);
+  color: var(--text);
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -128,7 +129,7 @@ onUnmounted(() => {
 }
 
 .modal-media {
-  background: var(--accent-soft);
+  background: var(--surface-elevated);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -147,8 +148,9 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--line);
-  color: var(--ink-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
   font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -162,10 +164,6 @@ onUnmounted(() => {
   gap: 12px;
 }
 
-.modal-body h2 {
-  font-family: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
-}
-
 .modal-meta {
   display: flex;
   flex-wrap: wrap;
@@ -173,8 +171,9 @@ onUnmounted(() => {
 }
 
 .modal-meta .chip {
-  background: var(--accent-soft);
-  color: var(--ink-2);
+  background: var(--surface-elevated);
+  color: var(--text);
+  border: 1px solid var(--border);
   border-radius: 999px;
   padding: 4px 10px;
   font-size: 0.8rem;
@@ -183,25 +182,20 @@ onUnmounted(() => {
 
 .modal-completed {
   margin: 0;
-  color: var(--ink-2);
+  color: var(--muted);
   font-size: 0.9rem;
 }
 
 .modal-manage h3 {
   margin: 0 0 4px;
   font-size: 0.85rem;
-  color: var(--accent);
+  color: var(--primary);
   letter-spacing: 0.06em;
 }
 
 .modal-manage p {
   margin: 0;
   white-space: pre-wrap;
-}
-
-.edit-button {
-  border-color: var(--accent);
-  color: var(--accent);
 }
 
 .modal-nav {
@@ -212,13 +206,29 @@ onUnmounted(() => {
 }
 
 .nav-button {
-  border: 1px solid var(--line);
+  border: 1px solid var(--border);
   border-radius: 999px;
   padding: 8px 16px;
-  background: var(--surface);
-  color: var(--ink);
+  background: var(--surface-elevated);
+  color: var(--text);
+  font: inherit;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nav-button:hover {
+  border-color: var(--primary);
+}
+
+.edit-button {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.edit-button:hover {
+  border-color: var(--primary);
 }
 
 .nav-button:disabled {
