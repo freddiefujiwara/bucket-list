@@ -26,13 +26,13 @@ describe('staging-banner', () => {
 
   describe('productionUrl', () => {
     it('drops the trailing staging/ segment from the base', () => {
-      expect(productionUrl({ BASE_URL: '/bucket-list/staging/' })).toBe(
-        '/bucket-list/'
+      expect(productionUrl({ BASE_URL: '/bucket-list-admin/staging/' })).toBe(
+        '/bucket-list-admin/'
       );
     });
 
     it('returns the base unchanged when it is not a staging base', () => {
-      expect(productionUrl({ BASE_URL: '/bucket-list/' })).toBe('/bucket-list/');
+      expect(productionUrl({ BASE_URL: '/bucket-list-admin/' })).toBe('/bucket-list-admin/');
     });
 
     it('falls back to "/" when BASE_URL is missing', () => {
